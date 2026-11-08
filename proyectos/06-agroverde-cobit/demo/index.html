@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBERSECURITY GRC DASHBOARD | AgroVerde & COBIT 2019</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --grc-bg: #090c14;
+      --grc-card: #0f1523;
+      --grc-card-sub: #161e31;
+      --grc-border: #1e293b;
+      --grc-border-sub: rgba(56, 189, 248, 0.2);
+      --grc-text: #f1f5f9;
+      --grc-muted: #94a3b8;
+      --grc-red: #ef4444;
+      --grc-orange: #f97316;
+      --grc-amber: #f59e0b;
+      --grc-green: #10b981;
+      --grc-blue: #38bdf8;
+      --grc-purple: #818cf8;
+    }
+    [data-theme="light"] {
+      --grc-bg: #f1f5f9;
+      --grc-card: #ffffff;
+      --grc-card-sub: #f8fafc;
+      --grc-border: #cbd5e1;
+      --grc-border-sub: rgba(124, 58, 237, 0.2);
+      --grc-text: #0f172a;
+      --grc-muted: #64748b;
+      --grc-red: #dc2626;
+      --grc-orange: #ea580c;
+      --grc-amber: #d97706;
+      --grc-green: #059669;
+      --grc-blue: #0284c7;
+      --grc-purple: #6d28d9;
+    }
+
+    body {
+      background-color: var(--grc-bg);
+      color: var(--grc-text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .grc-nav {
+      background: var(--grc-card);
+      border-bottom: 1px solid var(--grc-border);
+      padding: 0.85rem 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+
+    .grc-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* 6-PANEL GRID ESTILO FOTO 4 */
+    .grc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 1100px) {
+      .grc-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .grc-card {
+      background: var(--grc-card);
+      border: 1px solid var(--grc-border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      position: relative;
+    }
+
+    .grc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--grc-border);
+      padding-bottom: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .grc-card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--grc-text);
+    }
+
+    .grc-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 650px) {
+      .grc-kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .grc-kpi-chip {
+      background: var(--grc-card-sub);
+      border: 1px solid var(--grc-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    .grc-kpi-chip .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-top: 0.2rem;
+    }
+    .grc-kpi-chip .lbl {
+      font-size: 0.7rem;
+      color: var(--grc-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* HEATMAP 5x5 */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      background: rgba(0,0,0,0.2);
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--grc-border);
+    }
+    .heat-cell {
+      height: 38px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .heat-cell:hover {
+      transform: scale(1.08);
+      z-index: 5;
+    }
+    .heat-green { background: rgba(16, 185, 129, 0.35); border: 1px solid rgba(16, 185, 129, 0.6); }
+    .heat-yellow { background: rgba(245, 158, 11, 0.35); border: 1px solid rgba(245, 158, 11, 0.6); }
+    .heat-orange { background: rgba(249, 115, 22, 0.45); border: 1px solid rgba(249, 115, 22, 0.7); }
+    .heat-red { background: rgba(239, 68, 68, 0.45); border: 1px solid rgba(239, 68, 68, 0.7); }
+
+    .risk-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(255,255,255,0.9);
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+
+    /* TABLAS INTERNAS */
+    .grc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .grc-table th {
+      background: var(--grc-card-sub);
+      color: var(--grc-muted);
+      padding: 0.5rem 0.65rem;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 1px solid var(--grc-border);
+    }
+    .grc-table td {
+      padding: 0.5rem 0.65rem;
+      border-bottom: 1px solid var(--grc-border);
+    }
+    .grc-table tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .badge-approved {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.7rem;
+    }
+    .badge-pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.7rem;
+    }
+    .badge-critical {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.7rem;
+    }
+
+    .progress-bar-bg {
+      background: var(--grc-card-sub);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 0.3rem;
+      border: 1px solid var(--grc-border);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN SUPERIOR ESTILO CIBERSEGURIDAD GRC -->
+  <nav class="grc-nav">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <a href="../../../index.html" style="color: #38bdf8; font-weight: 800; text-decoration: none; font-size: 0.9rem;">
+        ← <span id="txt-back">Volver al Portafolio</span>
+      </a>
+      <div style="font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 0.45rem;">
+        <span style="color: #ef4444;">🛡️</span>
+        <span style="letter-spacing: 0.05em;">CYBERSECURITY GRC DASHBOARD</span>
+      </div>
+      <span style="font-size: 0.75rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.2rem 0.65rem; border-radius: 999px; font-weight: 700;">
+        AgroVerde S.A. • COBIT 2019
+      </span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button onclick="window.print()" class="control-btn" style="border-color: #38bdf8; color: #38bdf8; font-size: 0.8rem;">
+        🖨️ Exportar Informe GRC
+      </button>
+      <button onclick="toggleTheme()" class="control-btn" id="btn-theme">🌙 Noche</button>
+    </div>
+  </nav>
+
+  <div class="grc-container">
+
+    <!-- RESUMEN DEL SISTEMA DE AUDITORÍA -->
+    <div style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.5rem;">
+      <div style="font-size: 0.82rem; color: var(--grc-muted); line-height: 1.5;">
+        <strong style="color: #38bdf8;">Marco de Control:</strong> COBIT 2019 &amp; ISO/IEC 27001 • 
+        <strong style="color: #10b981;">Alcance:</strong> Red Operacional OT, Telemetría Agrícola SCADA y Servidores Cloud AgroVerde.
+      </div>
+      <div style="font-size: 0.78rem; font-family: 'JetBrains Mono'; color: #cbd5e1;">
+        Auditora: <strong>Ruth Bermúdez</strong> (Estudiante Ing. Sistemas)
+      </div>
+    </div>
+
+    <!-- LOS 6 PANELES DE CONTROL CORRESPONDIENTES A LA FOTO 4 -->
+    <div class="grc-grid">
+
+      <!-- ==============================================
+           PANEL 1: EXECUTIVE OVERVIEW (FOTO 4 - TOP LEFT)
+           ============================================== -->
+      <div class="grc-card">
+        <div class="grc-card-header">
+          <div class="grc-card-title">
+            <span style="color: #ef4444;">🛡️</span> Executive Overview
+          </div>
+          <span style="font-size: 0.72rem; color: var(--grc-muted); font-family: 'JetBrains Mono';">Live SOC Telemetry</span>
+        </div>
+
+        <!-- 4 KPIS -->
+        <div class="grc-kpi-row">
+          <div class="grc-kpi-chip">
+            <div class="lbl">High Risks</div>
+            <div class="num" style="color: var(--grc-red);">12 <span style="font-size: 0.75rem; color: var(--grc-muted);">/100</span></div>
+          </div>
+          <div class="grc-kpi-chip">
+            <div class="lbl">Compliance</div>
+            <div class="num" style="color: var(--grc-green);">82%</div>
+          </div>
+          <div class="grc-kpi-chip">
+            <div class="lbl">Open Vulns</div>
+            <div class="num" style="color: var(--grc-orange);">18 <span style="font-size: 0.75rem; color: var(--grc-muted);">/100</span></div>
+          </div>
+          <div class="grc-kpi-chip">
+            <div class="lbl">Controls</div>
+            <div class="num" style="color: var(--grc-blue);">76%</div>
+          </div>
+        </div>
+
+        <!-- DONUT & TREND ROW -->
+        <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 1rem; align-items: center;">
+          <!-- DONA DE DISTRIBUCION DE RIESGOS -->
+          <div style="text-align: center;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Risk Distribution</div>
+            <svg width="130" height="130" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#1e293b" stroke-width="14" />
+              <!-- Low (Green 45%) -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="14" stroke-dasharray="107 238" stroke-dashoffset="0" />
+              <!-- Medium (Orange 35%) -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#f97316" stroke-width="14" stroke-dasharray="83 238" stroke-dashoffset="-107" />
+              <!-- High (Red 20%) -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#ef4444" stroke-width="14" stroke-dasharray="48 238" stroke-dashoffset="-190" />
+              <text x="50" y="54" text-anchor="middle" font-size="12" font-weight="bold" fill="white">82%</text>
+            </svg>
+            <div style="display: flex; justify-content: center; gap: 0.5rem; font-size: 0.68rem; margin-top: 0.3rem;">
+              <span style="color: #ef4444;">■ High</span>
+              <span style="color: #f97316;">■ Medium</span>
+              <span style="color: #10b981;">■ Low</span>
+            </div>
+          </div>
+
+          <!-- GRÁFICO MULTI-LÍNEA TENDENCIA -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Tendencia de Riesgo Anual</div>
+            <svg width="100%" height="110" viewBox="0 0 200 90" style="overflow: visible;">
+              <!-- Grid lines -->
+              <line x1="10" y1="20" x2="190" y2="20" stroke="#1e293b" stroke-width="1" stroke-dasharray="2" />
+              <line x1="10" y1="50" x2="190" y2="50" stroke="#1e293b" stroke-width="1" stroke-dasharray="2" />
+              <line x1="10" y1="80" x2="190" y2="80" stroke="#1e293b" stroke-width="1" stroke-dasharray="2" />
+
+              <!-- High Risk Trend (Red) -->
+              <polyline fill="none" stroke="#ef4444" stroke-width="2" points="10,65 40,55 70,68 100,45 130,50 160,35 190,40" />
+              <circle cx="190" cy="40" r="3" fill="#ef4444" />
+
+              <!-- Medium Trend (Orange) -->
+              <polyline fill="none" stroke="#f97316" stroke-width="2" points="10,45 40,40 70,35 100,30 130,42 160,25 190,20" />
+              <circle cx="190" cy="20" r="3" fill="#f97316" />
+
+              <!-- Low Trend (Green) -->
+              <polyline fill="none" stroke="#10b981" stroke-width="2" points="10,75 40,70 70,60 100,55 130,65 160,50 190,45" />
+              <circle cx="190" cy="45" r="3" fill="#10b981" />
+            </svg>
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b; font-family: 'JetBrains Mono';">
+              <span>Ene</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           PANEL 2: RISK MANAGEMENT (FOTO 4 - TOP RIGHT)
+           ============================================== -->
+      <div class="grc-card">
+        <div class="grc-card-header">
+          <div class="grc-card-title">
+            <span style="color: #38bdf8;">🛡️</span> Risk Management
+          </div>
+          <span style="font-size: 0.72rem; color: #10b981; font-family: 'JetBrains Mono';">COBIT EDM03 / APO12</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.1fr 1.4fr; gap: 1rem;">
+          <!-- 5x5 HEATMAP -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Risk Heatmap 5x5</div>
+            <div class="heatmap-grid" id="heatmap-container">
+              <!-- Row 5 (Critical) -->
+              <div class="heat-cell heat-yellow" onclick="showRiskDetail('R-004', 'Inyección Firmware', 'Medio')"></div>
+              <div class="heat-cell heat-orange"></div>
+              <div class="heat-cell heat-orange"></div>
+              <div class="heat-cell heat-red" onclick="showRiskDetail('R-001', 'Falla SCADA IoT', 'Crítico')"><div class="risk-dot"></div></div>
+              <div class="heat-cell heat-red" onclick="showRiskDetail('R-002', 'Fuga de Datos Cloud', 'Crítico')"><div class="risk-dot"></div></div>
+
+              <!-- Row 4 -->
+              <div class="heat-cell heat-yellow"></div>
+              <div class="heat-cell heat-yellow"></div>
+              <div class="heat-cell heat-orange" onclick="showRiskDetail('R-003', 'Corte Riego Cloud', 'Alto')"><div class="risk-dot"></div></div>
+              <div class="heat-cell heat-orange"></div>
+              <div class="heat-cell heat-red"></div>
+
+              <!-- Row 3 -->
+              <div class="heat-cell heat-green"></div>
+              <div class="heat-cell heat-yellow"></div>
+              <div class="heat-cell heat-yellow"></div>
+              <div class="heat-cell heat-orange"></div>
+              <div class="heat-cell heat-orange"></div>
+
+              <!-- Row 2 -->
+              <div class="heat-cell heat-green"></div>
+              <div class="heat-cell heat-green"></div>
+              <div class="heat-cell heat-yellow" onclick="showRiskDetail('R-005', 'Falla Sensores Humedad', 'Bajo')"><div class="risk-dot"></div></div>
+              <div class="heat-cell heat-yellow"></div>
+              <div class="heat-cell heat-orange"></div>
+
+              <!-- Row 1 (Low) -->
+              <div class="heat-cell heat-green"></div>
+              <div class="heat-cell heat-green"></div>
+              <div class="heat-cell heat-green"></div>
+              <div class="heat-cell heat-yellow"></div>
+              <div class="heat-cell heat-yellow"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b; margin-top: 0.3rem;">
+              <span>Impacto 1</span>
+              <span>Likelihood →</span>
+              <span>Impacto 5</span>
+            </div>
+          </div>
+
+          <!-- RISK REGISTER TABLE -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted);">Risk Register</span>
+              <span style="font-size: 0.7rem; color: #38bdf8; cursor: pointer;" onclick="alert('Riesgos categorizados según probabilidad e impacto residual.')">Ver Metodología</span>
+            </div>
+            <div style="max-height: 190px; overflow-y: auto;">
+              <table class="grc-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Riesgo</th>
+                    <th>Nivel</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="risk-table-body">
+                  <tr>
+                    <td style="font-family:'JetBrains Mono'; color:#38bdf8;">R-001</td>
+                    <td>Intrusión SCADA OT</td>
+                    <td><span class="badge-critical">Crítico</span></td>
+                    <td style="color:#10b981; font-weight:700;">Mitigado</td>
+                  </tr>
+                  <tr>
+                    <td style="font-family:'JetBrains Mono'; color:#38bdf8;">R-002</td>
+                    <td>Exfiltración BD Cloud</td>
+                    <td><span class="badge-critical">Crítico</span></td>
+                    <td style="color:#f59e0b; font-weight:700;">En Proceso</td>
+                  </tr>
+                  <tr>
+                    <td style="font-family:'JetBrains Mono'; color:#38bdf8;">R-003</td>
+                    <td>Corte Sistema de Riego</td>
+                    <td><span class="badge-pending">Alto</span></td>
+                    <td style="color:#10b981; font-weight:700;">Mitigado</td>
+                  </tr>
+                  <tr>
+                    <td style="font-family:'JetBrains Mono'; color:#38bdf8;">R-004</td>
+                    <td>Firmware no firmado</td>
+                    <td><span class="badge-pending">Medio</span></td>
+                    <td style="color:#38bdf8; font-weight:700;">Abierto</td>
+                  </tr>
+                  <tr>
+                    <td style="font-family:'JetBrains Mono'; color:#38bdf8;">R-005</td>
+                    <td>Falla de Batería Sensor</td>
+                    <td><span class="badge-approved">Bajo</span></td>
+                    <td style="color:#10b981; font-weight:700;">Cerrado</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           PANEL 3: COMPLIANCE STATUS (FOTO 4 - MID LEFT)
+           ============================================== -->
+      <div class="grc-card">
+        <div class="grc-card-header">
+          <div class="grc-card-title">
+            <span style="color: #10b981;">🛡️</span> Compliance Status
+          </div>
+          <span style="font-size: 0.72rem; color: #10b981; font-weight: 800;">Global 82% Conforme</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 1rem; margin-bottom: 1rem;">
+          <!-- COMPLIANCE BY FRAMEWORK -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Compliance by Framework</div>
+            <svg width="100%" height="110" viewBox="0 0 160 100">
+              <!-- COBIT 2019 (90%) -->
+              <rect x="15" y="10" width="22" height="80" rx="3" fill="#10b981" />
+              <text x="26" y="8" font-size="9" text-anchor="middle" fill="#10b981" font-weight="bold">90%</text>
+              <text x="26" y="98" font-size="8" text-anchor="middle" fill="#94a3b8">COBIT</text>
+
+              <!-- ISO 27001 (75%) -->
+              <rect x="52" y="25" width="22" height="65" rx="3" fill="#38bdf8" />
+              <text x="63" y="22" font-size="9" text-anchor="middle" fill="#38bdf8" font-weight="bold">75%</text>
+              <text x="63" y="98" font-size="8" text-anchor="middle" fill="#94a3b8">ISO</text>
+
+              <!-- NIST CSF (68%) -->
+              <rect x="89" y="32" width="22" height="58" rx="3" fill="#f59e0b" />
+              <text x="100" y="29" font-size="9" text-anchor="middle" fill="#f59e0b" font-weight="bold">68%</text>
+              <text x="100" y="98" font-size="8" text-anchor="middle" fill="#94a3b8">NIST</text>
+
+              <!-- CIS Controls (84%) -->
+              <rect x="126" y="16" width="22" height="74" rx="3" fill="#818cf8" />
+              <text x="137" y="13" font-size="9" text-anchor="middle" fill="#818cf8" font-weight="bold">84%</text>
+              <text x="137" y="98" font-size="8" text-anchor="middle" fill="#94a3b8">CIS</text>
+            </svg>
+          </div>
+
+          <!-- RISK DOMAINS PROGRESS BARS -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.6rem;">Risk Domains</div>
+
+            <div style="margin-bottom: 0.65rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
+                <span>Control de Accesos (DSS05.04)</span>
+                <span style="color: #10b981;">90%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 90%; background: #10b981;"></div>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.65rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
+                <span>Seguridad de Red OT (DSS05.02)</span>
+                <span style="color: #f97316;">75%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 75%; background: #f97316;"></div>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.65rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
+                <span>Protección de Datos Cloud (APO01)</span>
+                <span style="color: #f59e0b;">68%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 68%; background: #f59e0b;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 BOTTOM PILLS -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; border-top: 1px solid var(--grc-border); padding-top: 0.75rem;">
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.75rem; color: #10b981; font-weight: 700;">✓ % Controles Implementados</span>
+            <strong style="color: #10b981; font-size: 1.1rem; font-family: 'JetBrains Mono';">84%</strong>
+          </div>
+          <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">✓ % Hallazgos Cerrados</span>
+            <strong style="color: #38bdf8; font-size: 1.1rem; font-family: 'JetBrains Mono';">92%</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           PANEL 4: CONTROLS EFFECTIVENESS (FOTO 4 - MID RIGHT)
+           ============================================== -->
+      <div class="grc-card">
+        <div class="grc-card-header">
+          <div class="grc-card-title">
+            <span style="color: #f97316;">🛡️</span> Controls Effectiveness
+          </div>
+          <span style="font-size: 0.72rem; color: #f97316; font-family: 'JetBrains Mono';">Auditoría CMMI Nivel 3</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1rem; align-items: center;">
+          <!-- CONTROLS STATUS DONUT -->
+          <div style="text-align: center;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Estado de Controles</div>
+            <svg width="120" height="120" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#1e293b" stroke-width="12" />
+              <!-- Implemented (65%) -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="12" stroke-dasharray="155 238" stroke-dashoffset="0" />
+              <!-- Partially (25%) -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#f59e0b" stroke-width="12" stroke-dasharray="60 238" stroke-dashoffset="-155" />
+              <!-- Not Implemented (10%) -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#ef4444" stroke-width="12" stroke-dasharray="23 238" stroke-dashoffset="-215" />
+              <text x="50" y="54" text-anchor="middle" font-size="11" font-weight="bold" fill="white">76%</text>
+            </svg>
+            <div style="font-size: 0.65rem; color: var(--grc-muted); margin-top: 0.2rem;">
+              <span style="color:#10b981;">● Imp.</span> <span style="color:#f59e0b;">● Parcial</span> <span style="color:#ef4444;">● Pendiente</span>
+            </div>
+          </div>
+
+          <!-- CONTROLS LIST TABLE -->
+          <div style="max-height: 190px; overflow-y: auto;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Controls List</div>
+            <table class="grc-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Control</th>
+                  <th>Estado</th>
+                  <th>Revisión</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-family:'JetBrains Mono'; color:#38bdf8;">C-101</td>
+                  <td>Firewall Configuration</td>
+                  <td><span class="badge-approved">Approved</span></td>
+                  <td style="font-size:0.7rem; color:#94a3b8;">25-Jul-2026</td>
+                </tr>
+                <tr>
+                  <td style="font-family:'JetBrains Mono'; color:#38bdf8;">C-201</td>
+                  <td>Privileged Access Mgt</td>
+                  <td><span class="badge-approved">Approved</span></td>
+                  <td style="font-size:0.7rem; color:#94a3b8;">20-Jul-2026</td>
+                </tr>
+                <tr>
+                  <td style="font-family:'JetBrains Mono'; color:#38bdf8;">C-205</td>
+                  <td>Backup &amp; DR Policy</td>
+                  <td><span class="badge-pending">Pending</span></td>
+                  <td style="font-size:0.7rem; color:#94a3b8;">28-Jul-2026</td>
+                </tr>
+                <tr>
+                  <td style="font-family:'JetBrains Mono'; color:#38bdf8;">C-302</td>
+                  <td>IoT Gateway Encryption</td>
+                  <td><span class="badge-approved">Approved</span></td>
+                  <td style="font-size:0.7rem; color:#94a3b8;">01-Ago-2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           PANEL 5: INCIDENTS & VULNERABILITIES (FOTO 4 - BTM LEFT)
+           ============================================== -->
+      <div class="grc-card">
+        <div class="grc-card-header">
+          <div class="grc-card-title">
+            <span style="color: #ef4444;">🚨</span> Incidents &amp; Vulnerabilities
+          </div>
+          <button onclick="simulateIncident()" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.25rem 0.65rem; border-radius: 6px; font-weight: 800; font-size: 0.72rem; cursor: pointer;">
+            ⚡ Simular Alerta OT
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 1rem; margin-bottom: 0.75rem;">
+          <!-- INCIDENTS OVER TIME -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Incidentes en Tiempo Real</div>
+            <svg width="100%" height="90" viewBox="0 0 160 80">
+              <line x1="10" y1="20" x2="150" y2="20" stroke="#1e293b" stroke-width="1" />
+              <line x1="10" y1="50" x2="150" y2="50" stroke="#1e293b" stroke-width="1" />
+              <polyline fill="none" stroke="#38bdf8" stroke-width="2" points="10,60 35,40 60,65 85,30 110,45 135,20 150,25" />
+              <circle cx="150" cy="25" r="3" fill="#38bdf8" />
+              <polyline fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3" points="10,70 35,65 60,68 85,50 110,55 135,35 150,40" />
+            </svg>
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b;">
+              <span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span>
+            </div>
+          </div>
+
+          <!-- VULNERABILITIES BY SEVERITY -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Vulnerabilidades por Gravedad</div>
+            <svg width="100%" height="90" viewBox="0 0 140 80">
+              <!-- Critical (4) -->
+              <rect x="15" y="45" width="20" height="30" rx="3" fill="#ef4444" />
+              <text x="25" y="40" font-size="9" text-anchor="middle" fill="#ef4444" font-weight="bold">4</text>
+              <text x="25" y="88" font-size="7.5" text-anchor="middle" fill="#94a3b8">Crítica</text>
+
+              <!-- High (8) -->
+              <rect x="45" y="25" width="20" height="50" rx="3" fill="#f97316" />
+              <text x="55" y="20" font-size="9" text-anchor="middle" fill="#f97316" font-weight="bold">8</text>
+              <text x="55" y="88" font-size="7.5" text-anchor="middle" fill="#94a3b8">Alta</text>
+
+              <!-- Medium (12) -->
+              <rect x="75" y="10" width="20" height="65" rx="3" fill="#f59e0b" />
+              <text x="85" y="8" font-size="9" text-anchor="middle" fill="#f59e0b" font-weight="bold">12</text>
+              <text x="85" y="88" font-size="7.5" text-anchor="middle" fill="#94a3b8">Media</text>
+
+              <!-- Low (18) -->
+              <rect x="105" y="5" width="20" height="70" rx="3" fill="#10b981" />
+              <text x="115" y="3" font-size="9" text-anchor="middle" fill="#10b981" font-weight="bold">18</text>
+              <text x="115" y="88" font-size="7.5" text-anchor="middle" fill="#94a3b8">Baja</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- MTTD & MTTR METRICS -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; border-top: 1px solid var(--grc-border); padding-top: 0.75rem;">
+          <div style="background: var(--grc-card-sub); border: 1px solid var(--grc-border); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.75rem; color: var(--grc-muted); font-weight: 700;">🛡️ MTTD (Tiempo Detección)</span>
+            <strong style="color: #ef4444; font-size: 1.1rem; font-family: 'JetBrains Mono';">4.5 hrs</strong>
+          </div>
+          <div style="background: var(--grc-card-sub); border: 1px solid var(--grc-border); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.75rem; color: var(--grc-muted); font-weight: 700;">🛡️ MTTR (Tiempo Resolución)</span>
+            <strong style="color: #f59e0b; font-size: 1.1rem; font-family: 'JetBrains Mono';">6.2 hrs</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           PANEL 6: GOVERNANCE & AUDIT (FOTO 4 - BTM RIGHT)
+           ============================================== -->
+      <div class="grc-card">
+        <div class="grc-card-header">
+          <div class="grc-card-title">
+            <span style="color: #818cf8;">📑</span> Governance &amp; Audit
+          </div>
+          <span style="font-size: 0.72rem; color: #818cf8; font-family: 'JetBrains Mono';">ISACA COBIT 2019 Core</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 1rem; align-items: center;">
+          <!-- AUDIT FINDINGS BY SEVERITY -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Hallazgos de Auditoría</div>
+            <svg width="100%" height="90" viewBox="0 0 120 80">
+              <!-- Critical (2) -->
+              <rect x="15" y="45" width="22" height="30" rx="3" fill="#ef4444" />
+              <text x="26" y="40" font-size="9" text-anchor="middle" fill="#ef4444" font-weight="bold">2</text>
+              <text x="26" y="88" font-size="7.5" text-anchor="middle" fill="#94a3b8">Críticos</text>
+
+              <!-- Major (5) -->
+              <rect x="50" y="25" width="22" height="50" rx="3" fill="#f59e0b" />
+              <text x="61" y="20" font-size="9" text-anchor="middle" fill="#f59e0b" font-weight="bold">5</text>
+              <text x="61" y="88" font-size="7.5" text-anchor="middle" fill="#94a3b8">Mayores</text>
+
+              <!-- Low (9) -->
+              <rect x="85" y="10" width="22" height="65" rx="3" fill="#10b981" />
+              <text x="96" y="8" font-size="9" text-anchor="middle" fill="#10b981" font-weight="bold">9</text>
+              <text x="96" y="88" font-size="7.5" text-anchor="middle" fill="#94a3b8">Menores</text>
+            </svg>
+          </div>
+
+          <!-- POLICIES OVERVIEW TABLE -->
+          <div style="max-height: 190px; overflow-y: auto;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--grc-muted); margin-bottom: 0.4rem;">Policies Overview</div>
+            <table class="grc-table">
+              <thead>
+                <tr>
+                  <th>Política Corporativa</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Data Privacy &amp; GDPR Policy</td>
+                  <td><span class="badge-approved">Approved ✓</span></td>
+                </tr>
+                <tr>
+                  <td>IT &amp; SCADA Security Policy</td>
+                  <td><span class="badge-pending">Pending ⏳</span></td>
+                </tr>
+                <tr>
+                  <td>Access Control &amp; IAM Policy</td>
+                  <td><span class="badge-approved">Approved ✓</span></td>
+                </tr>
+                <tr>
+                  <td>Disaster Recovery Plan (DRP)</td>
+                  <td><span class="badge-approved">Approved ✓</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- DICTAMEN DE AUDITORIA FORMAL -->
+        <div style="margin-top: 0.85rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.76rem; color: #34d399; line-height: 1.5;">
+          <strong>Conclusión del Informe de Gobierno:</strong> El nivel de madurez objetivo Nivel 3 (COBIT 2019) permite a AgroVerde salvaguardar la producción agroexportadora, mitigando el riesgo de paro operacional en un 82%.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let grc_theme = localStorage.getItem('theme') || 'dark';
+
+    function toggleTheme() {
+      grc_theme = grc_theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', grc_theme);
+      localStorage.setItem('theme', grc_theme);
+      document.getElementById('btn-theme').textContent = grc_theme === 'dark' ? '🌙 Noche' : '☀️ Día';
+    }
+
+    function showRiskDetail(id, desc, level) {
+      alert(`📌 Detalle del Riesgo:\n\nCódigo: ${id}\nDescripción: ${desc}\nNivel Residual: ${level}\nDominio COBIT: DSS05 (Seguridad Gestionada)\nPlan de Mitigación: Controles de red y auditoría activa.`);
+    }
+
+    function simulateIncident() {
+      alert(`🚨 ¡ALERTA DE SEGURIDAD SIMULADA!\n\nEvento: Intrusión anómala detectada en Gateway SCADA IoT (GW-LORA-01).\nAcción Automática: Protocolo COBIT DSS05.02 activado.\nResultado: Aislamiento perimetral ejecutado en 0.8 segundos. Sin afectación de riego.`);
+    }
+
+    document.documentElement.setAttribute('data-theme', grc_theme);
+  </script>
+</body>
+</html>

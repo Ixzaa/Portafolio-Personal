@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruth Bermúdez | Desarrolladora Backend .NET</title>
+  <meta name="description" content="Portafolio profesional de Ruth Bermúdez, estudiante de Ingeniería en Sistemas de Información y desarrolladora backend con C#, ASP.NET Core y SQL Server.">
+  <meta name="author" content="Ruth Ixzayara Bermúdez Cuba">
+  <meta property="og:title" content="Ruth Bermúdez | Desarrolladora Backend .NET">
+  <meta property="og:description" content="Sistemas de gestión comercial, APIs REST en C#, modelado en SQL Server y aplicaciones prácticas funcionales.">
+  <meta property="og:type" content="website">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- CANVAS DE FONDO SUTIL DE PARTÍCULAS -->
+  <canvas id="bg-constellation"></canvas>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">
+        <span class="logo-badge">&lt;/&gt;</span>
+        <span>Ruth Bermúdez</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#proyectos" class="nav-link">Proyectos</a>
+        <a href="#habilidades" class="nav-link">Habilidades</a>
+        <a href="#sobre-mi" class="nav-link">Sobre Mí &amp; Contacto</a>
+      </nav>
+
+      <div class="nav-controls">
+        <button id="theme-toggle-btn" class="control-btn" title="Alternar Modo Día / Noche">
+          🌙 Noche
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main style="position: relative; z-index: 1;">
+    
+    <!-- =================================================================
+         HERO SECTION MINIMALISTA & ENFOCADO (INSPIRADO EN DRIBBLE / SHADCN)
+         ================================================================= -->
+    <section id="hero" class="hero" style="max-width: 880px; text-align: center; padding-top: 4.5rem; padding-bottom: 2.5rem;">
+      
+      <div class="hero-pill">
+        <span class="hero-status-dot"></span>
+        <span>Estudiante de Ingeniería en Sistemas | UNAN</span>
+      </div>
+
+      <h1 class="hero-title" style="margin-top: 0.5rem; margin-bottom: 1.25rem;">
+        <span>Ruth Bermúdez</span> <br>
+        <span class="gradient-text">Desarrolladora Backend .NET</span>
+      </h1>
+
+      <p class="hero-subtitle" style="margin-bottom: 2.25rem; max-width: 720px;">
+        Desarrollo APIs REST en <strong>C# y ASP.NET Core</strong>, diseño bases de datos relacionales en <strong>Microsoft SQL Server</strong> y construyo aplicaciones web prácticas con <strong>JavaScript</strong>.
+      </p>
+
+      <div class="hero-actions" style="margin-bottom: 2.5rem;">
+        <a href="#proyectos" class="btn-primary">
+          <span>Explorar Proyectos (6) ↓</span>
+        </a>
+        <a href="#sobre-mi" class="btn-secondary">
+          <span>Sobre Mí &amp; Contacto</span>
+        </a>
+      </div>
+
+      <!-- TIRA SUTIL DE VALOR TÉCNICO (SIN CAJAS PESADAS) -->
+      <div class="hero-trust-strip">
+        <div class="hero-trust-item">
+          <span class="hero-trust-check">✓</span>
+          <span><strong>6 Proyectos</strong> Prácticos</span>
+        </div>
+        <div class="hero-trust-item">
+          <span class="hero-trust-check">✓</span>
+          <span>Backend <strong>C# &amp; ASP.NET Core</strong></span>
+        </div>
+        <div class="hero-trust-item">
+          <span class="hero-trust-check">✓</span>
+          <span>Bases de Datos <strong>SQL Server (3FN)</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         SECCIÓN DE PROYECTOS (LIMPIOS, 3 FUNCIONALIDADES CLAVE Y SIN RUIDO)
+         ================================================================= -->
+    <section id="proyectos" class="section-container" style="padding-top: 3rem;">
+      <div class="section-header">
+        <div class="section-tag">Soluciones Desarrolladas</div>
+        <h2 class="section-heading">Proyectos Prácticos</h2>
+        <p class="section-description">
+          Cada proyecto ha sido desarrollado como una aplicación completa con su propia interfaz, lógica de negocio y código fuente disponible.
+        </p>
+      </div>
+
+      <!-- 4 FILTROS CONSOLIDADOS (LIMPIOS Y EQUILIBRADOS) -->
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-filter="all">Todos (6)</button>
+        <button class="filter-btn" data-filter="backend">Backend &amp; Bases de Datos (2)</button>
+        <button class="filter-btn" data-filter="mobile-gaming">Móvil &amp; Videojuegos (2)</button>
+        <button class="filter-btn" data-filter="analytics-gov">Ciencia de Datos &amp; Auditoría (2)</button>
+      </div>
+
+      <!-- GRID DE PROYECTOS -->
+      <div class="projects-grid">
+
+        <!-- PROYECTO 1: DISTRIBUIDORA WALTER (PROYECTO DESTACADO) -->
+        <article class="project-card" data-category="backend" style="border-color: rgba(168, 85, 247, 0.45);">
+          <div>
+            <div class="project-header-bar" style="padding: 0 0 0.75rem 0;">
+              <span class="project-category-badge" style="background: var(--gradient-primary); color: white;">
+                ⭐ PROYECTO PRINCIPAL • ERP B2B
+              </span>
+              <span class="project-status"><span class="status-dot"></span> Demo Activo</span>
+            </div>
+
+            <h3 class="project-title">Distribuidora Walter — Sistema Web Comercial</h3>
+            <p class="project-description">
+              Plataforma de gestión comercial mayorista desarrollada con arquitectura desacoplada: API REST en ASP.NET Core, base de datos SQL Server y panel web administrativo.
+            </p>
+
+            <!-- 3 FUNCIONALIDADES PRINCIPALES -->
+            <ul class="project-highlights">
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Dashboard con 6 KPIs de ventas, facturación y clientes frecuentes.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Catálogo mayorista con control de stock, carrito y facturación.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>API RESTful con Swagger y persistencia relacional en SQL Server.</span>
+              </li>
+            </ul>
+
+            <div class="project-tags">
+              <span class="project-tag">C# .NET 8</span>
+              <span class="project-tag">ASP.NET Core Web API</span>
+              <span class="project-tag">SQL Server</span>
+              <span class="project-tag">JavaScript</span>
+            </div>
+          </div>
+
+          <div class="project-actions">
+            <a href="proyectos/01-distribuidora-walter/demo/index.html" target="_blank" rel="noopener noreferrer" class="btn-open-demo">
+              <span>🚀 Ver Proyecto ERP</span>
+            </a>
+            <a href="proyectos/01-distribuidora-walter/codigo-fuente/" target="_blank" rel="noopener noreferrer" class="btn-view-code">
+              <span>📂 Código C#</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- PROYECTO 2: FARMACIADB (DB & PHARMLY DASHBOARD) -->
+        <article class="project-card" data-category="backend">
+          <div>
+            <div class="project-header-bar" style="padding: 0 0 0.75rem 0;">
+              <span class="project-category-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.35);">
+                Bases de Datos &amp; Inventario
+              </span>
+              <span class="project-status"><span class="status-dot"></span> Demo Activo</span>
+            </div>
+
+            <h3 class="project-title">FarmaciaDB — Panel de Inventario Pharmly</h3>
+            <p class="project-description">
+              Sistema de control de existencias farmacéuticas en 3FN con panel administrativo Pharmly, gestión de lotes y consola de ejecución SQL Server.
+            </p>
+
+            <!-- 3 FUNCIONALIDADES PRINCIPALES -->
+            <ul class="project-highlights">
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Monitoreo de 20,500+ medicamentos y alertas tempranas de caducidad.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Consola interactiva para consultas T-SQL con JOINs y Stored Procedures.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Simulador de bloqueos transaccionales y consistencia ACID.</span>
+              </li>
+            </ul>
+
+            <div class="project-tags">
+              <span class="project-tag">SQL Server 2022</span>
+              <span class="project-tag">T-SQL Stored Procedures</span>
+              <span class="project-tag">Modelado 3FN</span>
+              <span class="project-tag">JavaScript</span>
+            </div>
+          </div>
+
+          <div class="project-actions">
+            <a href="proyectos/02-farmaciadb/demo/index.html" target="_blank" rel="noopener noreferrer" class="btn-open-demo">
+              <span>🚀 Ver Sistema Pharmly</span>
+            </a>
+            <a href="proyectos/02-farmaciadb/codigo-fuente/" target="_blank" rel="noopener noreferrer" class="btn-view-code">
+              <span>📂 Scripts SQL</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- PROYECTO 3: APLICACIÓN MÓVIL (DOCTORAPP TELEMEDICINA REALISTA) -->
+        <article class="project-card" data-category="mobile-gaming">
+          <div>
+            <div class="project-header-bar" style="padding: 0 0 0.75rem 0;">
+              <span class="project-category-badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.35);">
+                Desarrollo Móvil Flutter
+              </span>
+              <span class="project-status"><span class="status-dot"></span> Demo Activo</span>
+            </div>
+
+            <h3 class="project-title">DoctorApp — Telemedicina &amp; Galería Flutter</h3>
+            <p class="project-description">
+              Simulador interactivo de aplicación móvil desarrollada con Flutter y Dart, que integra videoconsulta médica en tiempo real con hardware de cámara web.
+            </p>
+
+            <!-- 3 FUNCIONALIDADES PRINCIPALES -->
+            <ul class="project-highlights">
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Módulo de videollamada real con acceso a cámara web vía WebRTC.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Galería interactiva con 4 pantallas: Dashboard, To-Do, Discover y Grocery.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Monitor cardíaco EKG en tiempo real y checklist de medicación.</span>
+              </li>
+            </ul>
+
+            <div class="project-tags">
+              <span class="project-tag">Flutter</span>
+              <span class="project-tag">Dart</span>
+              <span class="project-tag">WebRTC</span>
+              <span class="project-tag">Material Design</span>
+            </div>
+          </div>
+
+          <div class="project-actions">
+            <a href="proyectos/03-app-movil-flutter/demo/index.html" target="_blank" rel="noopener noreferrer" class="btn-open-demo">
+              <span>🚀 Abrir DoctorApp</span>
+            </a>
+            <a href="proyectos/03-app-movil-flutter/codigo-fuente/" target="_blank" rel="noopener noreferrer" class="btn-view-code">
+              <span>📂 Código Dart</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- PROYECTO 4: MATHQUEST 2D (VIDEOJUEGO EDUCATIVO) -->
+        <article class="project-card" data-category="mobile-gaming">
+          <div>
+            <div class="project-header-bar" style="padding: 0 0 0.75rem 0;">
+              <span class="project-category-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.35);">
+                Videojuegos &amp; Lógica C#
+              </span>
+              <span class="project-status"><span class="status-dot"></span> Demo Activo</span>
+            </div>
+
+            <h3 class="project-title">MathQuest 2D — Videojuego Educativo</h3>
+            <p class="project-description">
+              Videojuego interactivo 2D desarrollado para ejercitar el cálculo mental mediante mecánicas de plataformas, física de colisiones y generación aritmética.
+            </p>
+
+            <!-- 3 FUNCIONALIDADES PRINCIPALES -->
+            <ul class="project-highlights">
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Entorno 2D jugable con físicas, monedas y control por teclado o táctil.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Generador aritmético con validación en tiempo real y puntuación.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Scripts modulares en C# para movimiento, colisiones y ciclo de juego.</span>
+              </li>
+            </ul>
+
+            <div class="project-tags">
+              <span class="project-tag">Unity Engine</span>
+              <span class="project-tag">C# Scripting</span>
+              <span class="project-tag">Física 2D</span>
+              <span class="project-tag">Game Logic</span>
+            </div>
+          </div>
+
+          <div class="project-actions">
+            <a href="proyectos/04-videojuego-educativo/demo/index.html" target="_blank" rel="noopener noreferrer" class="btn-open-demo">
+              <span>🚀 Jugar MathQuest</span>
+            </a>
+            <a href="proyectos/04-videojuego-educativo/codigo-fuente/" target="_blank" rel="noopener noreferrer" class="btn-view-code">
+              <span>📂 Scripts Unity</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- PROYECTO 5: MINERÍA DE DATOS CON PYTHON -->
+        <article class="project-card" data-category="analytics-gov">
+          <div>
+            <div class="project-header-bar" style="padding: 0 0 0.75rem 0;">
+              <span class="project-category-badge" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border-color: rgba(139, 92, 246, 0.35);">
+                Ciencia de Datos &amp; ML
+              </span>
+              <span class="project-status"><span class="status-dot"></span> Demo Activo</span>
+            </div>
+
+            <h3 class="project-title">Estudio Comparativo de Modelos ML</h3>
+            <p class="project-description">
+              Evaluación experimental de modelos de Machine Learning (Random Forest, Regresión Logística y Árboles de Decisión) para predicción de riesgo crediticio.
+            </p>
+
+            <!-- 3 FUNCIONALIDADES PRINCIPALES -->
+            <ul class="project-highlights">
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Comparativa de curvas ROC y cálculo dinámico de AUC / F1-Score.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Matriz de confusión interactiva con calibración de umbrales.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Pipeline analítico con Pandas, NumPy y Scikit-Learn.</span>
+              </li>
+            </ul>
+
+            <div class="project-tags">
+              <span class="project-tag">Python 3</span>
+              <span class="project-tag">Scikit-Learn</span>
+              <span class="project-tag">Pandas &amp; NumPy</span>
+              <span class="project-tag">Jupyter</span>
+            </div>
+          </div>
+
+          <div class="project-actions">
+            <a href="proyectos/05-mineria-datos/demo/index.html" target="_blank" rel="noopener noreferrer" class="btn-open-demo">
+              <span>🚀 Ver Estudio ML</span>
+            </a>
+            <a href="proyectos/05-mineria-datos/codigo-fuente/" target="_blank" rel="noopener noreferrer" class="btn-view-code">
+              <span>📂 Notebook .py</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- PROYECTO 6: AGROVERDE COBIT (CYBERSECURITY GRC DASHBOARD) -->
+        <article class="project-card" data-category="analytics-gov">
+          <div>
+            <div class="project-header-bar" style="padding: 0 0 0.75rem 0;">
+              <span class="project-category-badge" style="background: rgba(6, 182, 212, 0.15); color: #22d3ee; border-color: rgba(6, 182, 212, 0.35);">
+                Gobierno TI &amp; Auditoría GRC
+              </span>
+              <span class="project-status"><span class="status-dot"></span> Demo Activo</span>
+            </div>
+
+            <h3 class="project-title">AgroVerde — Dashboard GRC &amp; COBIT 2019</h3>
+            <p class="project-description">
+              Dashboard de gobernanza y ciberseguridad industrial para agroexportación, alineado a los marcos COBIT 2019 e ISO 27001 para evaluación de madurez CMMI.
+            </p>
+
+            <!-- 3 FUNCIONALIDADES PRINCIPALES -->
+            <ul class="project-highlights">
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Matriz de riesgos interactiva (Heatmap 5x5 de probabilidad vs impacto).</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>6 paneles de control: cumplimiento, efectividad de controles e incidentes.</span>
+              </li>
+              <li class="highlight-item">
+                <span class="highlight-bullet">✓</span>
+                <span>Dictamen formal de auditoría para comités de dirección listo para PDF.</span>
+              </li>
+            </ul>
+
+            <div class="project-tags">
+              <span class="project-tag">COBIT 2019</span>
+              <span class="project-tag">GRC Dashboard</span>
+              <span class="project-tag">Risk Heatmap 5x5</span>
+              <span class="project-tag">CMMI Madurez</span>
+            </div>
+          </div>
+
+          <div class="project-actions">
+            <a href="proyectos/06-agroverde-cobit/demo/index.html" target="_blank" rel="noopener noreferrer" class="btn-open-demo">
+              <span>🚀 Ver Dashboard GRC</span>
+            </a>
+            <a href="proyectos/06-agroverde-cobit/codigo-fuente/" target="_blank" rel="noopener noreferrer" class="btn-view-code">
+              <span>📂 Documentación</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- =================================================================
+         SECCIÓN DE HABILIDADES TÉCNICAS (BENTO GRID LIMPIO, SIN PORCENTAJES)
+         ================================================================= -->
+    <section id="habilidades" class="section-container" style="padding-top: 2rem;">
+      <div class="section-header">
+        <div class="section-tag">Competencias Técnicas</div>
+        <h2 class="section-heading">Stack Tecnológico</h2>
+        <p class="section-description">
+          Conocimientos fundamentados en proyectos de software prácticos y formación universitaria en Ingeniería en Sistemas de Información.
+        </p>
+      </div>
+
+      <div class="skills-grid">
+        
+        <!-- BACKEND .NET -->
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">
+            <span>⚙️</span> <span>Backend (.NET)</span>
+          </h3>
+          <div class="skill-chips-wrap">
+            <span class="tech-chip">C# (.NET 8)</span>
+            <span class="tech-chip">ASP.NET Core Web API</span>
+            <span class="tech-chip">Entity Framework Core</span>
+            <span class="tech-chip">APIs RESTful &amp; CRUD</span>
+            <span class="tech-chip">Documentación Swagger</span>
+          </div>
+        </div>
+
+        <!-- BASES DE DATOS -->
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">
+            <span>🗄️</span> <span>Bases de Datos</span>
+          </h3>
+          <div class="skill-chips-wrap">
+            <span class="tech-chip">Microsoft SQL Server</span>
+            <span class="tech-chip">T-SQL Stored Procedures</span>
+            <span class="tech-chip">Consultas con JOINs</span>
+            <span class="tech-chip">Modelado Relacional (3FN)</span>
+            <span class="tech-chip">Vistas &amp; Triggers</span>
+          </div>
+        </div>
+
+        <!-- FRONTEND WEB -->
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">
+            <span>🌐</span> <span>Frontend Web</span>
+          </h3>
+          <div class="skill-chips-wrap">
+            <span class="tech-chip">JavaScript (ES6+)</span>
+            <span class="tech-chip">HTML5 Semántico</span>
+            <span class="tech-chip">CSS3 Flexbox &amp; Grid</span>
+            <span class="tech-chip">Consumo de APIs (Fetch)</span>
+            <span class="tech-chip">Diseño Responsivo</span>
+          </div>
+        </div>
+
+        <!-- OTRAS TECNOLOGÍAS -->
+        <div class="skill-category-card">
+          <h3 class="skill-category-title">
+            <span>📱</span> <span>Herramientas &amp; Otras Áreas</span>
+          </h3>
+          <div class="skill-chips-wrap">
+            <span class="tech-chip">Git &amp; GitHub</span>
+            <span class="tech-chip">Visual Studio 2022 &amp; SSMS</span>
+            <span class="tech-chip">Flutter &amp; Dart</span>
+            <span class="tech-chip">Unity &amp; C# (2D)</span>
+            <span class="tech-chip">Python (Ciencia de Datos)</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================
+         SECCIÓN SOBRE MÍ & CONTACTO DIRECTO (DOS TARJETAS BALANCEADAS)
+         ================================================================= -->
+    <section id="sobre-mi" class="section-container" style="padding-top: 2rem;">
+      <div class="section-header">
+        <div class="section-tag">Conoce a la Desarrolladora</div>
+        <h2 class="section-heading">Sobre Mí &amp; Contacto</h2>
+        <p class="section-description">
+          Formación académica, trayectoria profesional y vías de comunicación directa.
+        </p>
+      </div>
+
+      <div class="about-two-cards-grid">
+        
+        <!-- TARJETA 1: PERFIL & ENLACES DIRECTOS -->
+        <div class="about-card profile-card">
+          <div>
+            <div class="profile-header">
+              <img src="assets/img/ruth-bermudez.jpg" alt="Ruth Ixzayara Bermúdez Cuba" class="profile-photo">
+              <div>
+                <h3 class="profile-title">Ruth I. Bermúdez Cuba</h3>
+                <p class="profile-subtitle">Desarrolladora de Software | Backend .NET</p>
+                <div class="profile-location">
+                  <span>📍 Jinotepe, Nicaragua</span>
+                  <span style="opacity:0.5;">•</span>
+                  <span class="status-available">✓ Disponible para oportunidades</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-methods-list">
+              <a href="https://wa.me/50585357600?text=Hola%20Ruth,%20vi%20tu%20portafolio%20y%20me%20gustar%C3%ADa%20conversar." target="_blank" rel="noopener noreferrer" class="contact-method-item">
+                <span class="contact-icon" style="color: #25d366;">💬</span>
+                <div class="contact-info">
+                  <span class="contact-label">WhatsApp / Teléfono</span>
+                  <span class="contact-val">+505 8535 7600</span>
+                </div>
+              </a>
+
+              <div class="contact-method-item">
+                <span class="contact-icon" style="color: #38bdf8;">✉️</span>
+                <div class="contact-info">
+                  <span class="contact-label">Correo Electrónico</span>
+                  <span class="contact-val">Ruth.ixzayara.bermudez.cuba2809@gmail.com</span>
+                </div>
+                <button onclick="copyEmail()" class="copy-email-btn" id="btn-copy-email" title="Copiar correo">
+                  Copiar
+                </button>
+              </div>
+
+              <a href="https://github.com/Ixzaa" target="_blank" rel="noopener noreferrer" class="contact-method-item">
+                <span class="contact-icon" style="color: var(--accent-fuchsia);">💻</span>
+                <div class="contact-info">
+                  <span class="contact-label">GitHub</span>
+                  <span class="contact-val">github.com/Ixzaa</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <button onclick="openCvModal()" class="btn-cv-full">
+            <span>📄 Ver y Descargar CV Completo (PDF)</span>
+          </button>
+        </div>
+
+        <!-- TARJETA 2: PRESENTACIÓN PROFESIONAL & MENSAJE DIRECTO -->
+        <div class="about-card presentation-card">
+          <div>
+            <h3 class="card-section-title">Formación &amp; Perfil Profesional</h3>
+            
+            <div class="presentation-body">
+              <p>
+                Soy estudiante de <strong>Ingeniería en Sistemas de Información</strong> en la <strong>Universidad Nacional Autónoma de Nicaragua (UNAN)</strong>. Mi enfoque técnico se centra en el desarrollo backend con <strong>C# y ASP.NET Core</strong>, además del modelado y administración de bases de datos relacionales en <strong>Microsoft SQL Server</strong>.
+              </p>
+              <p>
+                He desarrollado proyectos prácticos aplicados a la gestión comercial mayorista (ERP B2B), inventarios farmacéuticos y consumo de servicios web. Me caracterizo por mi razonamiento lógico, responsabilidad y constancia para aprender nuevas tecnologías e integrarme a equipos de trabajo que valoren el código limpio y bien estructurado.
+              </p>
+            </div>
+          </div>
+
+          <!-- MINI FORMULARIO DIRECTO -->
+          <div class="quick-contact-box">
+            <h4 class="quick-contact-title">¿Tienes una propuesta laboral o consulta?</h4>
+            <form id="contact-form" class="clean-contact-form">
+              <div class="form-row-2">
+                <input type="text" id="name" placeholder="Tu nombre o empresa" required class="clean-input">
+                <input type="email" id="email" placeholder="tu.correo@ejemplo.com" required class="clean-input">
+              </div>
+              <textarea id="message" placeholder="Escribe un mensaje breve..." required class="clean-textarea"></textarea>
+              <div class="form-buttons-row">
+                <button type="submit" class="btn-send-mail">
+                  <span>✉️ Enviar Correo</span>
+                </button>
+                <button type="button" onclick="sendViaWhatsApp()" class="btn-send-wa">
+                  <span>💬 Enviar a WhatsApp</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =================================================================
+       MODAL DE CURRÍCULUM VITAE (CV ATS FRIENDLY LISTO PARA IMPRIMIR)
+       ================================================================= -->
+  <div id="modal-cv-overlay" class="modal-cv-overlay" onclick="handleCvOverlayClick(event)">
+    <div class="modal-cv-card">
+      <div class="modal-cv-header-bar">
+        <div>
+          <h2 style="font-size: 1.35rem; color: #0f172a; margin-bottom: 0.2rem;">Currículum Vitae</h2>
+          <span style="font-size: 0.85rem; color: #64748b;">Ruth Ixzayara Bermúdez Cuba</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button onclick="window.print()" class="btn-print-cv">
+            🖨️ Imprimir / Guardar en PDF
+          </button>
+          <button onclick="closeCvModal()" class="btn-close-modal">
+            ✕ Cerrar
+          </button>
+        </div>
+      </div>
+
+      <div style="line-height: 1.5; color: #334155;">
+        <header style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.25rem;">
+          <h1 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem;">Ruth Ixzayara Bermúdez Cuba</h1>
+          <div style="font-size: 1.05rem; font-weight: 700; color: #7c3aed; margin-bottom: 0.5rem;">
+            Desarrolladora de Software | Backend .NET • Estudiante de Ingeniería en Sistemas de Información (UNAN)
+          </div>
+          <div style="font-size: 0.88rem; color: #64748b; display: flex; flex-wrap: wrap; gap: 1rem;">
+            <span>📍 Jinotepe, Nicaragua</span>
+            <span>📱 Tel: +505 8535 7600</span>
+            <span>✉️ Ruth.ixzayara.bermudez.cuba2809@gmail.com</span>
+            <span>🌐 Modalidad: Remoto / Presencial</span>
+          </div>
+        </header>
+
+        <section style="margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.35rem; margin-bottom: 0.6rem;">
+            Perfil Profesional
+          </h2>
+          <p style="font-size: 0.92rem; color: #334155; line-height: 1.6;">
+            Estudiante de Ingeniería en Sistemas de Información en la UNAN, con enfoque y experiencia práctica en desarrollo backend con C#, ASP.NET Core y Microsoft SQL Server. Capacidad para diseñar bases de datos relacionales normalizadas (3FN), implementar endpoints RESTful seguros, gestionar transacciones atómicas y construir interfaces web reactivas con JavaScript. Orientada a la resolución metódica de problemas, con facilidad para aprender nuevas tecnologías y adaptarse a equipos de trabajo colaborativos.
+          </p>
+        </section>
+
+        <section style="margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.35rem; margin-bottom: 0.6rem;">
+            Formación Académica
+          </h2>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #0f172a; font-size: 0.95rem;">
+              <span>Universidad Nacional Autónoma de Nicaragua (UNAN)</span>
+              <span>En curso</span>
+            </div>
+            <div style="color: #7c3aed; font-weight: 600; font-size: 0.88rem;">
+              Ingeniería en Sistemas de Información
+            </div>
+            <div style="color: #64748b; font-size: 0.82rem; margin-top: 0.2rem;">
+              Formación en desarrollo de software, modelado de bases de datos relacionales, metodologías ágiles, arquitectura de sistemas y gobierno de TI (COBIT 2019).
+            </div>
+          </div>
+        </section>
+
+        <section style="margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.35rem; margin-bottom: 0.6rem;">
+            Competencias Técnicas
+          </h2>
+          <div style="font-size: 0.88rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+            <div><strong>Backend:</strong> C#, ASP.NET Core Web API, CRUD, Swagger, EF Core.</div>
+            <div><strong>Bases de Datos:</strong> SQL Server, T-SQL, Stored Procedures, JOINs, 3FN.</div>
+            <div><strong>Frontend Web:</strong> JavaScript (ES6+), HTML5, CSS3, Responsive Design.</div>
+            <div><strong>Herramientas:</strong> Visual Studio 2022, SSMS, Git, GitHub.</div>
+          </div>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.35rem; margin-bottom: 0.6rem;">
+            Proyectos Prácticos Destacados
+          </h2>
+          <div style="margin-bottom: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #0f172a; font-size: 0.92rem;">
+              <span>Distribuidora Walter — Sistema Web de Gestión Comercial</span>
+              <span style="color: #64748b; font-size: 0.82rem;">C# • ASP.NET Core • SQL Server • JS</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #475569; margin-top: 0.2rem;">
+              Desarrollo de plataforma B2B con módulos de compras, ventas, catálogo de productos y proveedores. Implementación de API REST con validación de stock y panel interactivo web.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #0f172a; font-size: 0.92rem;">
+              <span>FarmaciaDB — Panel de Inventario Farmacéutico</span>
+              <span style="color: #64748b; font-size: 0.82rem;">SQL Server • T-SQL • Stored Procedures</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #475569; margin-top: 0.2rem;">
+              Diseño de base de datos relacional normalizada en 3FN, procedimientos almacenados transaccionales y vistas para alertas tempranas de medicamentos vencidos.
+            </p>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #0f172a; font-size: 0.92rem;">
+              <span>DoctorApp — Telemedicina &amp; Videoconsulta Funcional</span>
+              <span style="color: #64748b; font-size: 0.82rem;">Flutter • Dart • Media Stream</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #475569; margin-top: 0.2rem;">
+              Aplicación de telemedicina con videoconsulta interactiva y cámara web en vivo, checklist reactivo de medicamentos y seguimiento de citas.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTÓN FLOTANTE DE WHATSAPP -->
+  <a href="https://wa.me/50585357600?text=Hola%20Ruth,%20vi%20tu%20portafolio%20y%20me%20gustar%C3%ADa%20conversar." target="_blank" rel="noopener noreferrer" class="floating-whatsapp" title="Contactar a Ruth por WhatsApp">
+    <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.697c.97.529 1.941.796 2.805.797h.002c3.181 0 5.767-2.586 5.768-5.766 0-3.18-2.586-5.779-5.769-5.779zm3.364 8.205c-.14.394-.712.729-1.002.776-.28.046-.641.077-1.047-.054-.251-.081-.575-.195-1.001-.38-1.795-.778-2.956-2.596-3.046-2.716-.089-.12-.731-.973-.731-1.856 0-.883.462-1.317.625-1.493.163-.177.356-.222.474-.222.119 0 .237.001.341.006.109.005.257-.042.401.304.149.356.505 1.233.549 1.323.044.09.074.195.015.314-.059.12-.089.195-.178.299-.089.105-.188.234-.268.315-.089.09-.182.188-.078.367.104.179.462.763.992 1.235.683.608 1.258.797 1.437.886.178.09.282.075.386-.045.104-.12.445-.52.564-.699.119-.179.238-.149.397-.09.158.06 1.008.475 1.182.562.173.088.291.132.335.207.045.074.045.431-.095.825zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.178L2 22l4.982-1.306A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+    <span>WhatsApp Ruth</span>
+  </a>
+
+  <footer>
+    <p>© 2026 Ruth Ixzayara Bermúdez Cuba — Estudiante de Ingeniería en Sistemas de Información | Desarrolladora Backend .NET. Jinotepe, Nicaragua.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

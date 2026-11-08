@@ -1,0 +1,43 @@
+{
+  "empresa": "AgroVerde S.A.",
+  "estandar": "ISACA COBIT 2019",
+  "fechaEvaluacion": "2026-11-07",
+  "escala": "CMMI 0 a 5",
+  "procesos": [
+    {
+      "codigo": "APO12",
+      "nombre": "Gestión del Riesgo Tecnológico",
+      "nivelActual": 2,
+      "nivelObjetivo": 4,
+      "responsable": "Oficial de Seguridad de la Información (CISO)"
+    },
+    {
+      "codigo": "APO13",
+      "nombre": "Gestión de la Seguridad de la Información",
+      "nivelActual": 1,
+      "nivelObjetivo": 4,
+      "responsable": "Líder de Ciberseguridad e Infraestructura"
+    },
+    {
+      "codigo": "BAI03",
+      "nombre": "Construcción e Identificación de Soluciones",
+      "nivelActual": 3,
+      "nivelObjetivo": 4,
+      "responsable": "Gerente de Desarrollo de Software"
+    },
+    {
+      "codigo": "DSS05",
+      "nombre": "Gestión de Servicios de Seguridad en Operaciones",
+      "nivelActual": 2,
+      "nivelObjetivo": 4,
+      "responsable": "Jefe de Operaciones TI y Soporte"
+    },
+    {
+      "codigo": "MEA01",
+      "nombre": "Monitoreo y Evaluación del Rendimiento",
+      "nivelActual": 3,
+      "nivelObjetivo": 4,
+      "responsable": "Auditor Interno de TI y PMO"
+    }
+  ]
+}

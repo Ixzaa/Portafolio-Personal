@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmaciaDB | SQL Server Database Studio & Pharmacy Management</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --f-bg: #0c0a1a;
+      --f-card: #141126;
+      --f-card-hover: #1f1a3a;
+      --f-border: rgba(168, 85, 247, 0.2);
+      --f-text: #f8fafc;
+      --f-muted: #cbd5e1;
+      --f-purple: #8b5cf6;
+      --f-violet: #7c3aed;
+      --f-fuchsia: #c084fc;
+      --f-amber: #f59e0b;
+      --f-emerald: #10b981;
+      --f-rose: #f43f5e;
+      --f-blue: #38bdf8;
+    }
+    [data-theme="light"] {
+      --f-bg: #f8f6ff;
+      --f-card: #ffffff;
+      --f-card-hover: #f3efff;
+      --f-border: #e5dbff;
+      --f-text: #1e113f;
+      --f-muted: #564875;
+      --f-purple: #7c3aed;
+      --f-violet: #6d28d9;
+      --f-fuchsia: #a855f7;
+      --f-amber: #d97706;
+      --f-emerald: #059669;
+      --f-rose: #e11d48;
+      --f-blue: #0284c7;
+    }
+    body {
+      background-color: var(--f-bg);
+      color: var(--f-text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+    .app-nav {
+      background: var(--f-card);
+      border-bottom: 1px solid var(--f-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1.25rem;
+      margin: 2rem 0;
+    }
+    .kpi-card {
+      background: var(--f-card);
+      border: 1px solid var(--f-border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--f-purple);
+    }
+    .kpi-num {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 0.35rem;
+    }
+    .sql-playground {
+      background: #0d1117;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .sql-tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      color: #cbd5e1;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sql-tab-btn.active {
+      background: var(--gradient-primary);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+    .code-box {
+      background: #030712;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1.1rem;
+      color: #fcd34d;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      margin: 1.25rem 0;
+    }
+    .table-container {
+      overflow-x: auto;
+      max-height: 320px;
+      border-radius: 10px;
+      border: 1px solid var(--f-border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th {
+      background: #1c1738;
+      color: var(--f-fuchsia);
+      padding: 0.8rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+    }
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--f-border);
+    }
+    tr:hover td {
+      background: rgba(168, 85, 247, 0.05);
+    }
+    .studio-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--f-border);
+      padding-bottom: 0.5rem;
+    }
+    .studio-tab-btn {
+      background: none;
+      border: none;
+      color: var(--f-muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .studio-tab-btn.active {
+      background: var(--f-card);
+      color: var(--f-fuchsia);
+      border: 1px solid var(--f-border);
+    }
+    .plan-node {
+      background: #171330;
+      border: 1px solid var(--f-border);
+      border-radius: 10px;
+      padding: 1rem;
+      width: 175px;
+      text-align: center;
+      position: relative;
+    }
+    .plan-node-cost {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--f-amber);
+      margin-top: 0.3rem;
+    }
+    .plan-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--f-muted);
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: var(--f-card);
+      border: 2px solid var(--f-purple);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 950px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="app-nav">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <a href="../../../index.html" style="color: var(--f-fuchsia); font-weight: 800; text-decoration: none; font-size: 0.95rem;">
+        ← <span id="txt-back">Volver al Portafolio</span>
+      </a>
+      <div style="font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🗄️</span>
+        <span>FarmaciaDB — SQL Server Database Studio &amp; Gestión Pharmly</span>
+      </div>
+      <span style="font-size: 0.75rem; background: rgba(168,85,247,0.15); color: var(--f-fuchsia); padding: 0.25rem 0.65rem; border-radius: 999px; font-weight: 700;">
+        👤 Base de Datos &amp; Inventario: FarmaciaDB
+      </span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button onclick="openSchemaModal()" class="control-btn" style="border-color: var(--f-purple); color: var(--f-fuchsia);">
+        📐 <span id="btn-schema">Diagrama Entidad-Relación (ERD)</span>
+      </button>
+      <button onclick="toggleTheme()" class="control-btn" id="btn-theme">🌙 Noche</button>
+      <button onclick="toggleLang()" class="control-btn" id="btn-lang">🇪🇸 ES</button>
+    </div>
+  </nav>
+
+  <div style="max-width: 1200px; margin: 0 auto; padding: 1.5rem;">
+
+    <!-- 3 KPIS PRINCIPALES ESTILO PHARMLY (FOTO 2) -->
+    <div class="kpi-row" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div class="kpi-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04)); border-color: rgba(16, 185, 129, 0.35);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 1.4rem;">📦</span>
+          <span style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;">Catálogo DB</span>
+        </div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--f-muted); font-weight: 700; margin-top: 0.5rem;">Total Productos</div>
+        <div class="kpi-num" style="color: #10b981;" id="kpi-total-prods">20,579</div>
+      </div>
+      <div class="kpi-card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.04)); border-color: rgba(245, 158, 11, 0.35);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 1.4rem;">⚠️</span>
+          <span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;">Reabastecer</span>
+        </div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--f-muted); font-weight: 700; margin-top: 0.5rem;">Stock Bajo (&lt;20 unid.)</div>
+        <div class="kpi-num" style="color: #fbbf24;" id="kpi-low-stock">120</div>
+      </div>
+      <div class="kpi-card" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04)); border-color: rgba(239, 68, 68, 0.35);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 1.4rem;">❌</span>
+          <span style="background: rgba(239, 68, 68, 0.2); color: #f87171; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;">Sin Stock</span>
+        </div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--f-muted); font-weight: 700; margin-top: 0.5rem;">Agotados en Almacén</div>
+        <div class="kpi-num" style="color: #f87171;" id="kpi-out-stock">89</div>
+      </div>
+    </div>
+
+    <!-- TABS DE NAVEGACION DE MODULOS -->
+    <div class="studio-tabs">
+      <button class="studio-tab-btn active" onclick="switchSection('pharmly')" id="stab-pharmly">
+        🌿 Panel Pharmly (Gestión de Inventario)
+      </button>
+      <button class="studio-tab-btn" onclick="switchSection('queries')" id="stab-queries">
+        ⚡ Consola T-SQL &amp; Procedimientos
+      </button>
+      <button class="studio-tab-btn" onclick="switchSection('plan')" id="stab-plan">
+        📊 Plan de Ejecución Gráfico (Execution Plan)
+      </button>
+      <button class="studio-tab-btn" onclick="switchSection('acid')" id="stab-acid">
+        🔒 Simulador de Transacciones ACID &amp; Locks
+      </button>
+    </div>
+
+    <!-- SECCIÓN 0: PANEL PHARMLY (DISEÑO FOTO 2) -->
+    <div id="sec-pharmly">
+      <!-- 8 TARJETAS DE CATEGORÍA ESTILO PHARMLY (FOTO 2) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div onclick="filterPharmlyCat('Antibióticos', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Antibióticos</span>
+            <span style="font-size: 1.25rem;">💊</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #10b981; margin: 0.25rem 0;">120</div>
+          <div style="font-size: 0.72rem; color: #10b981; font-weight: 700;">↗ +2% Desde la semana pasada</div>
+        </div>
+
+        <div onclick="filterPharmlyCat('Analgésicos', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Analgésicos</span>
+            <span style="font-size: 1.25rem;">🩹</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; margin: 0.25rem 0;">95</div>
+          <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 700;">↗ +0.5% Desde la semana pasada</div>
+        </div>
+
+        <div onclick="filterPharmlyCat('Vitaminas', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Vitaminas &amp; Supl.</span>
+            <span style="font-size: 1.25rem;">🧪</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #fbbf24; margin: 0.25rem 0;">75</div>
+          <div style="font-size: 0.72rem; color: #fbbf24; font-weight: 700;">↗ +2% Desde la semana pasada</div>
+        </div>
+
+        <div onclick="filterPharmlyCat('Antivirales', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Antivirales</span>
+            <span style="font-size: 1.25rem;">🛡️</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #c084fc; margin: 0.25rem 0;">50</div>
+          <div style="font-size: 0.72rem; color: #c084fc; font-weight: 700;">↗ +0.2% Desde la semana pasada</div>
+        </div>
+
+        <div onclick="filterPharmlyCat('Diabetes', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Cuidado Diabetes</span>
+            <span style="font-size: 1.25rem;">💉</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #f43f5e; margin: 0.25rem 0;">65</div>
+          <div style="font-size: 0.72rem; color: #f43f5e; font-weight: 700;">↗ +0.1% Desde la semana pasada</div>
+        </div>
+
+        <div onclick="filterPharmlyCat('Cardiovascular', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Cardiovascular</span>
+            <span style="font-size: 1.25rem;">❤️</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #10b981; margin: 0.25rem 0;">80</div>
+          <div style="font-size: 0.72rem; color: #10b981; font-weight: 700;">↗ +8% Desde la semana pasada</div>
+        </div>
+
+        <div onclick="filterPharmlyCat('Alergias', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Medicamentos Alergias</span>
+            <span style="font-size: 1.25rem;">🌿</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #fb923c; margin: 0.25rem 0;">40</div>
+          <div style="font-size: 0.72rem; color: #fb923c; font-weight: 700;">↗ +5% Desde la semana pasada</div>
+        </div>
+
+        <div onclick="filterPharmlyCat('Respiratorio', this)" class="pharmly-cat-box" style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 14px; padding: 1.1rem; cursor: pointer; transition: all 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--f-muted); font-weight: 700;">Medicinas Respiratorias</span>
+            <span style="font-size: 1.25rem;">🫁</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #818cf8; margin: 0.25rem 0;">55</div>
+          <div style="font-size: 0.72rem; color: #818cf8; font-weight: 700;">↗ +2.8% Desde la semana pasada</div>
+        </div>
+      </div>
+
+      <!-- CATEGORÍAS PHARMLY EN CHIPS -->
+      <div style="display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.75rem; margin-bottom: 1.25rem;" id="pharmly-chips">
+        <button class="sql-tab-btn active" onclick="filterPharmlyCat('all', this)">Todos (20,579)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Antibióticos', this)">Antibióticos (120)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Analgésicos', this)">Analgésicos (95)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Vitaminas', this)">Vitaminas &amp; Supl. (75)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Antivirales', this)">Antivirales (50)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Cardiovascular', this)">Cardiovascular (80)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Diabetes', this)">Diabetes (65)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Alergias', this)">Alergias (40)</button>
+        <button class="sql-tab-btn" onclick="filterPharmlyCat('Respiratorio', this)">Respiratorio (55)</button>
+      </div>
+
+      <!-- TABLA DE PRODUCTOS PHARMLY -->
+      <div style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex: 1; max-width: 450px;">
+            <input type="text" id="pharmly-search" placeholder="🔍 Buscar por medicamento o ID..." oninput="searchPharmlyTable()" style="flex: 1; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.6rem 1rem; border-radius: 8px; outline: none; font-size: 0.85rem;">
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <button onclick="openPharmlyAddModal()" style="background: #c7f284; color: #062320; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 15px rgba(199, 242, 132, 0.4);">
+              <span>➕</span> <span>Agregar Nuevo Medicamento</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Categoría</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Fecha Caducidad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="pharmly-table-body">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCION 1: CONSOLA DE CONSULTAS T-SQL -->
+    <div id="sec-queries">
+      <div class="sql-playground">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <h3 style="color: white; font-weight: 800;" id="txt-sql-heading">⚡ Consola de Consultas y Procedimientos T-SQL</h3>
+          <span style="font-size: 0.8rem; color: #a855f7; font-family: 'JetBrains Mono';">Database: [FarmaciaDB] | Host: (localdb)\MSSQLLocalDB | Engine: SQL Server 2022</span>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <button class="sql-tab-btn active" onclick="runQuery(0)" id="tab-0">1. INNER JOIN (Medicamentos + Lote + Lab)</button>
+          <button class="sql-tab-btn" onclick="runQuery(1)" id="tab-1">2. Vista vw_AlertasCaducidad</button>
+          <button class="sql-tab-btn" onclick="runQuery(2)" id="tab-2">3. EXEC sp_RegistrarVentaMedicamento</button>
+          <button class="sql-tab-btn" onclick="runQuery(3)" id="tab-3">4. Trigger AuditoriaStock</button>
+        </div>
+
+        <div class="code-box" id="sql-code-display"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #94a3b8;" id="sql-rows-info">Resultado de la consulta:</span>
+          <span style="font-size: 0.75rem; color: #10b981; font-family: 'JetBrains Mono';" id="sql-stats">Execution: 00:00:00.012 | Cost: 0.0032 | Index Seek</span>
+        </div>
+
+        <div class="table-container">
+          <table id="result-table">
+            <thead id="result-thead"></thead>
+            <tbody id="result-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- INSERCION DE NUEVO MEDICAMENTO -->
+      <div style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <h3 style="margin-bottom: 0.5rem; font-weight: 800;" id="txt-form-heading">➕ Inserción de Nuevo Lote Farmacéutico (T-SQL Transaction)</h3>
+        <p style="color: var(--f-muted); font-size: 0.85rem; margin-bottom: 1.25rem;" id="txt-form-sub">
+          Simula una transacción atómica con validación de restricciones CHECK e índices no agrupados.
+        </p>
+
+        <form id="add-med-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--f-muted);" id="lbl-name">Nombre Comercial</label>
+            <input type="text" id="in-name" required placeholder="Ej: Azitromicina 500mg" style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none; margin-top: 0.3rem;">
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--f-muted);" id="lbl-active">Principio Activo</label>
+            <input type="text" id="in-active" required placeholder="Ej: Azitromicina Dihidrato" style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none; margin-top: 0.3rem;">
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--f-muted);" id="lbl-stock">Stock Inicial</label>
+            <input type="number" id="in-stock" value="45" min="1" required style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none; margin-top: 0.3rem;">
+          </div>
+          <div>
+            <button type="submit" style="width: 100%; background: var(--gradient-primary); color: white; font-weight: 800; border: none; padding: 0.75rem; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);" id="btn-submit-med">
+              Ejecutar INSERT Transaccional
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- SECCION 2: PLAN DE EJECUCION GRAFICO (SSMS STYLE) -->
+    <div id="sec-plan" style="display: none;">
+      <div style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 16px; padding: 1.75rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-weight: 800; margin-bottom: 0.3rem;" id="txt-plan-title">Plan de Ejecución Estimado de SQL Server (Execution Plan)</h3>
+            <p style="color: var(--f-muted); font-size: 0.85rem;" id="txt-plan-sub">
+              Análisis comparativo de costos entre consulta ingenua con <strong>Table Scan</strong> vs optimizada con <strong>Covering Index Seek</strong>.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="sql-tab-btn active" id="btn-plan-opt" onclick="togglePlanView(true)">⚡ Con Índice (Seek)</button>
+            <button class="sql-tab-btn" id="btn-plan-unopt" onclick="togglePlanView(false)">🐢 Sin Índice (Scan)</button>
+          </div>
+        </div>
+
+        <!-- DIAGRAMA VISUAL DE OPERADORES -->
+        <div style="background: #090714; border: 1px solid var(--f-border); border-radius: 14px; padding: 2rem; overflow-x: auto;">
+          <div style="display: flex; align-items: center; gap: 1rem; min-width: 780px;" id="plan-flow-container">
+            <!-- Dynamic flow rendered by JS -->
+          </div>
+        </div>
+
+        <!-- METRICAS DETALLADAS DEL OPTIMIZADOR -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 10px; padding: 1rem;">
+            <span style="font-size: 0.75rem; color: var(--f-muted); text-transform: uppercase;">Subtree Cost Estimado</span>
+            <div style="font-size: 1.3rem; font-weight: 800; font-family: 'JetBrains Mono'; color: var(--f-emerald);" id="plan-stat-cost">0.00328</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 10px; padding: 1rem;">
+            <span style="font-size: 0.75rem; color: var(--f-muted); text-transform: uppercase;">Estimated CPU Cost</span>
+            <div style="font-size: 1.3rem; font-weight: 800; font-family: 'JetBrains Mono'; color: var(--f-purple);" id="plan-stat-cpu">0.00015</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 10px; padding: 1rem;">
+            <span style="font-size: 0.75rem; color: var(--f-muted); text-transform: uppercase;">Estimated I/O Cost</span>
+            <div style="font-size: 1.3rem; font-weight: 800; font-family: 'JetBrains Mono'; color: var(--f-blue);" id="plan-stat-io">0.00312</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 10px; padding: 1rem;">
+            <span style="font-size: 0.75rem; color: var(--f-muted); text-transform: uppercase;">Tipo de Búsqueda</span>
+            <div style="font-size: 1.1rem; font-weight: 800; font-family: 'JetBrains Mono'; color: var(--f-fuchsia);" id="plan-stat-type">Clustered Index Seek</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem; background: rgba(139, 92, 246, 0.08); border-left: 4px solid var(--f-purple); padding: 1rem 1.25rem; border-radius: 0 10px 10px 0;">
+          <strong style="color: var(--f-fuchsia); font-size: 0.9rem;" id="txt-dba-tip-title">💡 Dictamen de Rendimiento DBA:</strong>
+          <p style="color: var(--f-muted); font-size: 0.85rem; margin-top: 0.3rem;" id="plan-stat-tip">
+            El índice no agrupado <code>IX_Lotes_Vencimiento</code> con cláusula <code>INCLUDE(StockDisponible)</code> elimina la necesidad de <em>Key Lookups</em> costosos, reduciendo el I/O en un 94.2%.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCION 3: SIMULADOR DE TRANSACCIONES ACID & LOCKS -->
+    <div id="sec-acid" style="display: none;">
+      <div style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 16px; padding: 1.75rem;">
+        <h3 style="font-weight: 800; margin-bottom: 0.4rem;" id="txt-acid-title">Simulador de Transacciones ACID & Concurrencia de Bloqueos</h3>
+        <p style="color: var(--f-muted); font-size: 0.85rem; margin-bottom: 1.5rem;" id="txt-acid-sub">
+          Experimenta cómo el motor relacional gestiona bloqueos de fila exclusivos (X) y compartidos (S) protegiendo la atomicidad y consistencia.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          <!-- Panel Sesion 1 -->
+          <div style="background: #090714; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span style="font-weight: 800; color: var(--f-purple); font-size: 0.9rem;">Sesión SPID 54 (Cajero Farmacia 1)</span>
+              <span id="spid-status" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">CONNECTED</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+              <button onclick="acidBegin()" class="sql-tab-btn" id="btn-acid-begin">1. BEGIN TRAN</button>
+              <button onclick="acidUpdate()" class="sql-tab-btn" id="btn-acid-update" disabled>2. UPDATE Stock (-10)</button>
+              <button onclick="acidCommit()" class="sql-tab-btn" id="btn-acid-commit" disabled style="background:#10b981; color:white; border-color:transparent;">COMMIT</button>
+              <button onclick="acidRollback()" class="sql-tab-btn" id="btn-acid-rollback" disabled style="background:#f43f5e; color:white; border-color:transparent;">ROLLBACK</button>
+            </div>
+            <div style="font-family: 'JetBrains Mono'; font-size: 0.8rem; background: #030712; padding: 0.85rem; border-radius: 8px; color: #cbd5e1; height: 110px; overflow-y: auto;" id="acid-log-1">
+              -- Sesión lista. Presiona 'BEGIN TRAN' para iniciar transacción.
+            </div>
+          </div>
+
+          <!-- Panel Motor de Bloqueos (Lock Manager) -->
+          <div style="background: #090714; border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 12px; padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span style="font-weight: 800; color: var(--f-fuchsia); font-size: 0.9rem;">sys.dm_tran_locks (Lock Manager)</span>
+              <span style="font-size: 0.75rem; color: var(--f-muted); font-family: 'JetBrains Mono';">Isolation: READ COMMITTED</span>
+            </div>
+            <div style="font-family: 'JetBrains Mono'; font-size: 0.8rem; background: #030712; padding: 0.85rem; border-radius: 8px; color: #a855f7; height: 145px; overflow-y: auto;" id="acid-locks-view">
+              [Info] No hay bloqueos activos en sys.dm_tran_locks.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 8px; padding: 0.75rem; text-align: center;">
+            <strong style="color: var(--f-purple); font-size: 0.85rem;">[A] Atomicidad</strong>
+            <div style="font-size: 0.75rem; color: var(--f-muted); margin-top: 0.2rem;">Todo o Nada (Rollback automático ante fallas)</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 8px; padding: 0.75rem; text-align: center;">
+            <strong style="color: var(--f-purple); font-size: 0.85rem;">[C] Consistencia</strong>
+            <div style="font-size: 0.75rem; color: var(--f-muted); margin-top: 0.2rem;">Cumplimiento de CHECK (Stock &gt;= 0)</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 8px; padding: 0.75rem; text-align: center;">
+            <strong style="color: var(--f-purple); font-size: 0.85rem;">[I] Aislamiento</strong>
+            <div style="font-size: 0.75rem; color: var(--f-muted); margin-top: 0.2rem;">Lecturas sucias prevenidas vía Row Locks</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--f-border); border-radius: 8px; padding: 0.75rem; text-align: center;">
+            <strong style="color: var(--f-purple); font-size: 0.85rem;">[D] Durabilidad</strong>
+            <div style="font-size: 0.75rem; color: var(--f-muted); margin-top: 0.2rem;">Write-Ahead Logging (WAL) en archivo .LDF</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: DIAGRAMA ENTIDAD-RELACION (ERD) -->
+  <div class="modal-overlay" id="erd-modal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--f-border); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <h2 style="font-weight: 800; color: var(--f-fuchsia); margin-bottom: 0.3rem;" id="txt-erd-title">Diagrama Entidad-Relación de FarmaciaDB (Relational Schema)</h2>
+          <span style="font-size: 0.85rem; color: var(--f-muted);" id="txt-erd-sub">Normalización 3FN con claves primarias clustered e integridad referencial estricta.</span>
+        </div>
+        <button onclick="closeSchemaModal()" style="background:none; border:none; color:var(--f-text); font-size:1.8rem; cursor:pointer;">&times;</button>
+      </div>
+
+      <!-- SVG INTERACTIVO ERD -->
+      <div style="background: #070512; border: 1px solid var(--f-border); border-radius: 12px; padding: 1rem; overflow-x: auto;">
+        <svg viewBox="0 0 880 440" style="width: 100%; min-width: 750px; height: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+          <!-- TABLA: LABORATORIOS -->
+          <g transform="translate(30, 40)">
+            <rect width="210" height="110" rx="8" fill="#141126" stroke="#8b5cf6" stroke-width="2"/>
+            <rect width="210" height="28" rx="8" fill="#7c3aed"/>
+            <text x="105" y="19" fill="#fff" font-weight="bold" text-anchor="middle">Laboratorios</text>
+            <text x="12" y="50" fill="#f43f5e" font-weight="bold">PK  Id (INT, IDENTITY)</text>
+            <text x="12" y="70" fill="#cbd5e1">    NombreLaboratorio (VARCHAR)</text>
+            <text x="12" y="90" fill="#cbd5e1">    PaisOrigen (VARCHAR)</text>
+          </g>
+
+          <!-- TABLA: MEDICAMENTOS -->
+          <g transform="translate(330, 40)">
+            <rect width="220" height="135" rx="8" fill="#141126" stroke="#c084fc" stroke-width="2"/>
+            <rect width="220" height="28" rx="8" fill="#a855f7"/>
+            <text x="110" y="19" fill="#fff" font-weight="bold" text-anchor="middle">Medicamentos</text>
+            <text x="12" y="50" fill="#f43f5e" font-weight="bold">PK  Id (INT, IDENTITY)</text>
+            <text x="12" y="70" fill="#cbd5e1">    CodigoBarras (VARCHAR UK)</text>
+            <text x="12" y="90" fill="#cbd5e1">    NombreComercial (VARCHAR)</text>
+            <text x="12" y="110" fill="#cbd5e1">    PrincipioActivo (VARCHAR)</text>
+            <text x="12" y="128" fill="#38bdf8">FK  LaboratorioId (INT)</text>
+          </g>
+
+          <!-- LINEA 1:N LAB -> MED -->
+          <path d="M 240 85 L 330 85" stroke="#a855f7" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="280" y="78" fill="#a855f7" font-size="10">1 : N</text>
+
+          <!-- TABLA: LOTES MEDICAMENTOS -->
+          <g transform="translate(630, 40)">
+            <rect width="220" height="150" rx="8" fill="#141126" stroke="#8b5cf6" stroke-width="2"/>
+            <rect width="220" height="28" rx="8" fill="#7c3aed"/>
+            <text x="110" y="19" fill="#fff" font-weight="bold" text-anchor="middle">LotesMedicamentos</text>
+            <text x="12" y="50" fill="#f43f5e" font-weight="bold">PK  Id (INT, IDENTITY)</text>
+            <text x="12" y="70" fill="#38bdf8">FK  MedicamentoId (INT)</text>
+            <text x="12" y="90" fill="#cbd5e1">    NumeroLote (VARCHAR)</text>
+            <text x="12" y="110" fill="#cbd5e1">    StockDisponible (INT)</text>
+            <text x="12" y="130" fill="#cbd5e1">    FechaVencimiento (DATE)</text>
+            <text x="12" y="145" fill="#f59e0b">    PrecioVenta (DECIMAL)</text>
+          </g>
+
+          <!-- LINEA 1:N MED -> LOTES -->
+          <path d="M 550 100 L 630 100" stroke="#a855f7" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="585" y="92" fill="#a855f7" font-size="10">1 : N</text>
+
+          <!-- TABLA: DETALLE VENTAS -->
+          <g transform="translate(630, 250)">
+            <rect width="220" height="135" rx="8" fill="#141126" stroke="#38bdf8" stroke-width="2"/>
+            <rect width="220" height="28" rx="8" fill="#0284c7"/>
+            <text x="110" y="19" fill="#fff" font-weight="bold" text-anchor="middle">DetalleVentas</text>
+            <text x="12" y="50" fill="#f43f5e" font-weight="bold">PK  Id (INT, IDENTITY)</text>
+            <text x="12" y="70" fill="#38bdf8">FK  VentaId (INT)</text>
+            <text x="12" y="90" fill="#38bdf8">FK  LoteId (INT)</text>
+            <text x="12" y="110" fill="#cbd5e1">    Cantidad (INT)</text>
+            <text x="12" y="128" fill="#cbd5e1">    Subtotal (DECIMAL)</text>
+          </g>
+
+          <!-- LINEA 1:N LOTES -> DETALLE VENTAS -->
+          <path d="M 740 190 L 740 250" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="748" y="225" fill="#38bdf8" font-size="10">1 : N</text>
+
+          <!-- TABLA: VENTAS -->
+          <g transform="translate(330, 250)">
+            <rect width="220" height="135" rx="8" fill="#141126" stroke="#38bdf8" stroke-width="2"/>
+            <rect width="220" height="28" rx="8" fill="#0284c7"/>
+            <text x="110" y="19" fill="#fff" font-weight="bold" text-anchor="middle">Ventas</text>
+            <text x="12" y="50" fill="#f43f5e" font-weight="bold">PK  Id (INT, IDENTITY)</text>
+            <text x="12" y="70" fill="#cbd5e1">    NumeroFactura (VARCHAR)</text>
+            <text x="12" y="90" fill="#cbd5e1">    FechaEmision (DATETIME)</text>
+            <text x="12" y="110" fill="#cbd5e1">    Cliente (VARCHAR)</text>
+            <text x="12" y="128" fill="#10b981">    Total (DECIMAL)</text>
+          </g>
+
+          <!-- LINEA 1:N VENTAS -> DETALLE VENTAS -->
+          <path d="M 550 310 L 630 310" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="585" y="302" fill="#38bdf8" font-size="10">1 : N</text>
+
+          <!-- TABLA: AUDITORIA STOCK -->
+          <g transform="translate(30, 250)">
+            <rect width="210" height="135" rx="8" fill="#141126" stroke="#10b981" stroke-width="2"/>
+            <rect width="210" height="28" rx="8" fill="#059669"/>
+            <text x="105" y="19" fill="#fff" font-weight="bold" text-anchor="middle">AuditoriaStock (Trigger Log)</text>
+            <text x="12" y="50" fill="#f43f5e" font-weight="bold">PK  LogId (BIGINT)</text>
+            <text x="12" y="70" fill="#cbd5e1">    TipoOperacion (VARCHAR)</text>
+            <text x="12" y="90" fill="#cbd5e1">    TablaModificada (VARCHAR)</text>
+            <text x="12" y="110" fill="#cbd5e1">    UsuarioSQL (VARCHAR)</text>
+            <text x="12" y="128" fill="#cbd5e1">    FechaEvento (DATETIME)</text>
+          </g>
+        </svg>
+      </div>
+
+      <div style="margin-top: 1.5rem; text-align: right;">
+        <button onclick="closeSchemaModal()" style="background: var(--gradient-primary); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-weight: 700; cursor: pointer;">
+          Cerrar Vista Schema
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const f_i18n = {
+      es: {
+        back: "Volver al Portafolio",
+        btnSchema: "Diagrama Entidad-Relación (ERD)",
+        kpi1: "Medicamentos Catalogados",
+        kpi2: "Lotes Stock Crítico (<15)",
+        kpi3: "Buffer Cache Hit Ratio",
+        kpi4: "Procedimientos & Triggers",
+        stabQueries: "⚡ Consola T-SQL & Procedimientos",
+        stabPlan: "📊 Plan de Ejecución Gráfico (Execution Plan)",
+        stabAcid: "🔒 Simulador de Transacciones ACID & Locks",
+        sqlHeading: "⚡ Consola de Consultas y Procedimientos T-SQL",
+        formHeading: "➕ Inserción de Nuevo Lote Farmacéutico (T-SQL Transaction)",
+        formSub: "Simula una transacción atómica con validación de restricciones CHECK e índices no agrupados.",
+        lblName: "Nombre Comercial",
+        lblActive: "Principio Activo",
+        lblStock: "Stock Inicial",
+        btnSubmit: "Ejecutar INSERT Transaccional",
+        btnNight: "🌙 Noche",
+        btnDay: "☀️ Día",
+        resInfo: "Resultado de la consulta: ",
+        planTitle: "Plan de Ejecución Estimado de SQL Server (Execution Plan)",
+        planSub: "Análisis comparativo de costos entre consulta ingenua con Table Scan vs optimizada con Covering Index Seek.",
+        acidTitle: "Simulador de Transacciones ACID & Concurrencia de Bloqueos",
+        acidSub: "Experimenta cómo el motor relacional gestiona bloqueos de fila exclusivos (X) y compartidos (S) protegiendo la atomicidad y consistencia.",
+        erdTitle: "Diagrama Entidad-Relación de FarmaciaDB (Relational Schema)",
+        erdSub: "Normalización 3FN con claves primarias clustered e integridad referencial estricta."
+      },
+      en: {
+        back: "Back to Portfolio",
+        btnSchema: "Entity-Relationship Diagram (ERD)",
+        kpi1: "Cataloged Medicines",
+        kpi2: "Critical Stock Lots (<15)",
+        kpi3: "Buffer Cache Hit Ratio",
+        kpi4: "Active SPs & Triggers",
+        stabQueries: "⚡ T-SQL Console & Stored Procedures",
+        stabPlan: "📊 Graphical Execution Plan",
+        stabAcid: "🔒 ACID Transaction Simulator & Locks",
+        sqlHeading: "⚡ T-SQL Query Console & Stored Procedures",
+        formHeading: "➕ Insert New Pharmaceutical Batch (T-SQL Transaction)",
+        formSub: "Simulates an atomic transaction with CHECK constraints and non-clustered index updates.",
+        lblName: "Trade Name",
+        lblActive: "Active Ingredient",
+        lblStock: "Initial Stock",
+        btnSubmit: "Execute Transactional INSERT",
+        btnNight: "🌙 Night",
+        btnDay: "☀️ Day",
+        resInfo: "Query Execution Output: ",
+        planTitle: "SQL Server Estimated Graphical Execution Plan",
+        planSub: "Cost comparison analysis between naive Table Scan vs optimized Covering Index Seek.",
+        acidTitle: "ACID Transaction & Lock Concurrency Simulator",
+        acidSub: "Experience how the relational engine manages Exclusive (X) and Shared (S) row locks to ensure Atomicity and Consistency.",
+        erdTitle: "FarmaciaDB Entity-Relationship Diagram (Relational Schema)",
+        erdSub: "3NF Normalization with clustered primary keys and strict referential integrity."
+      }
+    };
+
+    let f_lang = localStorage.getItem('lang') || 'es';
+    let f_theme = localStorage.getItem('theme') || 'dark';
+
+    const sqlQueries = [
+      {
+        sql: `SELECT 
+    m.CodigoBarras, m.NombreComercial, m.PrincipioActivo,
+    l.NombreLaboratorio, lt.NumeroLote, lt.StockDisponible, lt.FechaVencimiento,
+    CASE WHEN lt.StockDisponible <= 15 THEN 'CRÍTICO' ELSE 'ÓPTIMO' END AS EstadoStock
+FROM Medicamentos m
+INNER JOIN Laboratorios l ON m.LaboratorioId = l.Id
+INNER JOIN LotesMedicamentos lt ON lt.MedicamentoId = m.Id
+WHERE m.Activo = 1
+ORDER BY lt.StockDisponible ASC;`,
+        headers: ["Código", "Nombre Comercial", "Principio Activo", "Laboratorio", "Lote", "Stock", "Vencimiento", "Estado", "Acción"],
+        rows: [
+          ["77021001", "Paracetamol 500mg", "Acetaminofén", "Genfar Labs", "LT-9921", "12", "2027-04-15", "<span style='color:#f87171; font-weight:bold;'>CRÍTICO</span>", "<button onclick='adjustStock(0, 10)' style='background:#7c3aed;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;'>+10 Reabastecer</button>"],
+          ["77021002", "Ibuprofeno 400mg", "Ibuprofeno", "Bayer S.A.", "LT-9922", "14", "2026-12-30", "<span style='color:#f87171; font-weight:bold;'>CRÍTICO</span>", "<button onclick='adjustStock(1, 10)' style='background:#7c3aed;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;'>+10 Reabastecer</button>"],
+          ["77021003", "Amoxicilina 500mg", "Amoxicilina Trihidrato", "Pfizer", "LT-8810", "65", "2027-08-20", "<span style='color:#34d399; font-weight:bold;'>ÓPTIMO</span>", "<button onclick='adjustStock(2, 5)' style='background:#7c3aed;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;'>+5 Reabastecer</button>"],
+          ["77021004", "Losartán 50mg", "Losartán Potásico", "MK Farmacéutica", "LT-7740", "120", "2028-01-10", "<span style='color:#34d399; font-weight:bold;'>ÓPTIMO</span>", "<button onclick='adjustStock(3, 5)' style='background:#7c3aed;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;'>+5 Reabastecer</button>"],
+          ["77021005", "Omeprazol 20mg", "Omeprazol", "Sandoz Novartis", "LT-6632", "88", "2027-11-05", "<span style='color:#34d399; font-weight:bold;'>ÓPTIMO</span>", "<button onclick='adjustStock(4, 5)' style='background:#7c3aed;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;'>+5 Reabastecer</button>"]
+        ]
+      },
+      {
+        sql: `CREATE VIEW vw_AlertasCaducidad AS
+SELECT 
+    m.NombreComercial, lt.NumeroLote, lt.StockDisponible, lt.FechaVencimiento,
+    DATEDIFF(day, GETDATE(), lt.FechaVencimiento) AS DiasRestantes
+FROM LotesMedicamentos lt
+INNER JOIN Medicamentos m ON lt.MedicamentoId = m.Id
+WHERE lt.FechaVencimiento <= DATEADD(day, 60, GETDATE());`,
+        headers: ["Medicamento", "Lote", "Stock Restante", "Fecha Vencimiento", "Días Restantes", "Acción Prioritaria"],
+        rows: [
+          ["Ibuprofeno 400mg", "LT-9922", "14", "2026-12-10", "18 días", "<span style='color:#f87171;'>Liquidación Inmediata</span>"],
+          ["Loratadina 10mg", "LT-3310", "8", "2026-12-24", "32 días", "<span style='color:#fbbf24;'>Devolución Proveedor</span>"]
+        ]
+      },
+      {
+        sql: `EXEC sp_RegistrarVentaMedicamento
+    @NombreCliente = 'Paciente: Roberto Gómez',
+    @LoteId = 3,
+    @Cantidad = 5,
+    @MetodoPago = 'Tarjeta Débito';
+
+-- Trigger trg_ActualizarStockVenta descuenta automáticamente el inventario:
+-- UPDATE LotesMedicamentos SET StockDisponible = StockDisponible - 5 WHERE Id = 3;`,
+        headers: ["Factura", "Fecha / Hora", "Medicamento", "Cantidad", "Total ($)", "Resultado Transacción"],
+        rows: [
+          ["FAC-10024", "2026-11-07 19:10", "Amoxicilina 500mg (LT-8810)", "5", "$22.50", "<span style='color:#34d399; font-weight:bold;'>COMMIT OK (Trigger Ejecutado)</span>"],
+          ["FAC-10023", "2026-11-07 18:42", "Paracetamol 500mg (LT-9921)", "2", "$6.00", "<span style='color:#34d399; font-weight:bold;'>COMMIT OK (Trigger Ejecutado)</span>"]
+        ]
+      },
+      {
+        sql: `SELECT LogId, TipoOperacion, TablaModificada, UsuarioSQL, FechaEvento, DetalleCambio
+FROM AuditoriaStock
+ORDER BY FechaEvento DESC;`,
+        headers: ["Log ID", "Operación", "Tabla", "Usuario SQL", "Fecha / Hora", "Detalle del Cambio"],
+        rows: [
+          ["LOG-5421", "UPDATE", "LotesMedicamentos", "farmacia_user", "2026-11-07 19:10:02", "Salida de 5 unidades por venta FAC-10024"],
+          ["LOG-5420", "INSERT", "Ventas", "cajero_pos01", "2026-11-07 19:10:00", "Nueva factura emitida por $22.50"],
+          ["LOG-5419", "UPDATE", "LotesMedicamentos", "farmacia_user", "2026-11-07 18:42:15", "Salida de 2 unidades por venta FAC-10023"]
+        ]
+      }
+    ];
+
+    function switchSection(sec) {
+      const secPharmly = document.getElementById('sec-pharmly');
+      const secQueries = document.getElementById('sec-queries');
+      const secPlan = document.getElementById('sec-plan');
+      const secAcid = document.getElementById('sec-acid');
+
+      if (secPharmly) secPharmly.style.display = sec === 'pharmly' ? 'block' : 'none';
+      if (secQueries) secQueries.style.display = sec === 'queries' ? 'block' : 'none';
+      if (secPlan) secPlan.style.display = sec === 'plan' ? 'block' : 'none';
+      if (secAcid) secAcid.style.display = sec === 'acid' ? 'block' : 'none';
+
+      document.getElementById('stab-pharmly')?.classList.toggle('active', sec === 'pharmly');
+      document.getElementById('stab-queries')?.classList.toggle('active', sec === 'queries');
+      document.getElementById('stab-plan')?.classList.toggle('active', sec === 'plan');
+      document.getElementById('stab-acid')?.classList.toggle('active', sec === 'acid');
+
+      if (sec === 'plan') {
+        renderPlanFlow(true);
+      }
+    }
+
+    function togglePlanView(optimized) {
+      document.getElementById('btn-plan-opt').classList.toggle('active', optimized);
+      document.getElementById('btn-plan-unopt').classList.toggle('active', !optimized);
+      renderPlanFlow(optimized);
+    }
+
+    function renderPlanFlow(opt) {
+      const container = document.getElementById('plan-flow-container');
+      if (opt) {
+        document.getElementById('plan-stat-cost').textContent = "0.00328";
+        document.getElementById('plan-stat-cpu').textContent = "0.00015";
+        document.getElementById('plan-stat-io').textContent = "0.00312";
+        document.getElementById('plan-stat-type').textContent = "Clustered Index Seek";
+        document.getElementById('plan-stat-tip').innerHTML = "El índice no agrupado <code>IX_Lotes_Vencimiento</code> con cláusula <code>INCLUDE(StockDisponible)</code> elimina la necesidad de <em>Key Lookups</em> costosos, reduciendo el I/O en un 94.2%.";
+        
+        container.innerHTML = `
+          <div class="plan-node">
+            <div style="font-size:1.4rem;">🎯</div>
+            <strong style="color:var(--f-fuchsia); font-size:0.85rem;">Index Seek</strong>
+            <div style="font-size:0.75rem; color:#94a3b8;">IX_Lotes_Vencimiento</div>
+            <div class="plan-node-cost">Cost: 8%</div>
+          </div>
+          <div class="plan-arrow">➔</div>
+          <div class="plan-node">
+            <div style="font-size:1.4rem;">🔗</div>
+            <strong style="color:var(--f-purple); font-size:0.85rem;">Nested Loops</strong>
+            <div style="font-size:0.75rem; color:#94a3b8;">Inner Join (PK_Medicamentos)</div>
+            <div class="plan-node-cost">Cost: 14%</div>
+          </div>
+          <div class="plan-arrow">➔</div>
+          <div class="plan-node">
+            <div style="font-size:1.4rem;">⚡</div>
+            <strong style="color:var(--f-blue); font-size:0.85rem;">Clustered Seek</strong>
+            <div style="font-size:0.75rem; color:#94a3b8;">PK_Laboratorios</div>
+            <div class="plan-node-cost">Cost: 12%</div>
+          </div>
+          <div class="plan-arrow">➔</div>
+          <div class="plan-node" style="border-color:#10b981;">
+            <div style="font-size:1.4rem;">✅</div>
+            <strong style="color:#10b981; font-size:0.85rem;">SELECT</strong>
+            <div style="font-size:0.75rem; color:#94a3b8;">Query Result Set</div>
+            <div class="plan-node-cost" style="color:#10b981;">Total Cost: 0.0032</div>
+          </div>
+        `;
+      } else {
+        document.getElementById('plan-stat-cost').textContent = "0.05890";
+        document.getElementById('plan-stat-cpu').textContent = "0.01240";
+        document.getElementById('plan-stat-io').textContent = "0.04650";
+        document.getElementById('plan-stat-type').textContent = "Table Scan (Clustered Scan)";
+        document.getElementById('plan-stat-tip').innerHTML = "⚠️ <strong>ALERTA DBA:</strong> Sin índice, SQL Server recorre el 100% de las páginas de datos en disco. Se genera contención de memoria en el Buffer Pool y lecturas físicas innecesarias.";
+        
+        container.innerHTML = `
+          <div class="plan-node" style="border-color:#f43f5e;">
+            <div style="font-size:1.4rem;">⚠️</div>
+            <strong style="color:#f43f5e; font-size:0.85rem;">Table Scan</strong>
+            <div style="font-size:0.75rem; color:#94a3b8;">LotesMedicamentos (Scan Completo)</div>
+            <div class="plan-node-cost" style="color:#f43f5e;">Cost: 72%</div>
+          </div>
+          <div class="plan-arrow">➔</div>
+          <div class="plan-node">
+            <div style="font-size:1.4rem;">⚙️</div>
+            <strong style="color:var(--f-amber); font-size:0.85rem;">Hash Match</strong>
+            <div style="font-size:0.75rem; color:#94a3b8;">Inner Join (TempDB Spill)</div>
+            <div class="plan-node-cost">Cost: 28%</div>
+          </div>
+          <div class="plan-arrow">➔</div>
+          <div class="plan-node" style="border-color:#f59e0b;">
+            <div style="font-size:1.4rem;">🐢</div>
+            <strong style="color:var(--f-amber); font-size:0.85rem;">SELECT</strong>
+            <div style="font-size:0.75rem; color:#94a3b8;">Query Result Set</div>
+            <div class="plan-node-cost" style="color:#f59e0b;">Total Cost: 0.0589 (18x Más Lento)</div>
+          </div>
+        `;
+      }
+    }
+
+    // SIMULADOR ACID
+    let acidState = 'IDLE';
+
+    function acidBegin() {
+      acidState = 'ACTIVE';
+      document.getElementById('btn-acid-begin').disabled = true;
+      document.getElementById('btn-acid-update').disabled = false;
+      document.getElementById('btn-acid-commit').disabled = true;
+      document.getElementById('btn-acid-rollback').disabled = true;
+
+      document.getElementById('spid-status').textContent = 'TRAN ACTIVE';
+      document.getElementById('spid-status').style.background = 'rgba(245, 158, 11, 0.2)';
+      document.getElementById('spid-status').style.color = '#fbbf24';
+
+      document.getElementById('acid-log-1').innerHTML = `
+        <span style="color:#10b981;">BEGIN TRANSACTION;</span><br>
+        -- Transacción abierta (LSN: 000142:000028:0001).<br>
+        -- Esperando sentencias DML...
+      `;
+
+      document.getElementById('acid-locks-view').innerHTML = `
+        [SPID 54] Intent Shared (IS) Lock en DATABASE [FarmaciaDB]
+      `;
+    }
+
+    function acidUpdate() {
+      if (acidState !== 'ACTIVE') return;
+      document.getElementById('btn-acid-update').disabled = true;
+      document.getElementById('btn-acid-commit').disabled = false;
+      document.getElementById('btn-acid-rollback').disabled = false;
+
+      document.getElementById('acid-log-1').innerHTML += `
+        <br><span style="color:#38bdf8;">UPDATE LotesMedicamentos SET StockDisponible = StockDisponible - 10 WHERE Id = 1;</span><br>
+        -- 1 fila afectada. Fila con Id=1 bloqueada de manera exclusiva.
+      `;
+
+      document.getElementById('acid-locks-view').innerHTML = `
+        [SPID 54] Intent Exclusive (IX) Lock en OBJETO [LotesMedicamentos]<br>
+        [SPID 54] <strong style="color:#f43f5e;">Exclusive (X) Lock en KEY (RID: 1:240:0)</strong><br>
+        -- Otras sesiones que intenten leer o modificar esta fila quedarán bloqueadas hasta COMMIT o ROLLBACK.
+      `;
+    }
+
+    function acidCommit() {
+      acidState = 'IDLE';
+      document.getElementById('btn-acid-begin').disabled = false;
+      document.getElementById('btn-acid-update').disabled = true;
+      document.getElementById('btn-acid-commit').disabled = true;
+      document.getElementById('btn-acid-rollback').disabled = true;
+
+      document.getElementById('spid-status').textContent = 'COMMITTED';
+      document.getElementById('spid-status').style.background = 'rgba(16, 185, 129, 0.2)';
+      document.getElementById('spid-status').style.color = '#34d399';
+
+      document.getElementById('acid-log-1').innerHTML += `
+        <br><span style="color:#10b981;">COMMIT TRANSACTION;</span><br>
+        -- Cambios persistidos en disco (.mdf) y en el Transaction Log (.ldf).<br>
+        -- Bloqueos liberados exitosamente.
+      `;
+
+      document.getElementById('acid-locks-view').innerHTML = `
+        [Info] Bloqueos liberados. 0 cerraduras activas. Consistencia ACID garantizada.
+      `;
+    }
+
+    function acidRollback() {
+      acidState = 'IDLE';
+      document.getElementById('btn-acid-begin').disabled = false;
+      document.getElementById('btn-acid-update').disabled = true;
+      document.getElementById('btn-acid-commit').disabled = true;
+      document.getElementById('btn-acid-rollback').disabled = true;
+
+      document.getElementById('spid-status').textContent = 'ROLLED BACK';
+      document.getElementById('spid-status').style.background = 'rgba(244, 63, 94, 0.2)';
+      document.getElementById('spid-status').style.color = '#fda4af';
+
+      document.getElementById('acid-log-1').innerHTML += `
+        <br><span style="color:#f43f5e;">ROLLBACK TRANSACTION;</span><br>
+        -- Reversión de cambios mediante Undo en Transaction Log.<br>
+        -- Stock restaurado al valor original. Cero inconsistencias.
+      `;
+
+      document.getElementById('acid-locks-view').innerHTML = `
+        [Info] Transacción abortada. Todos los bloqueos exclusivos fueron liberados inmediatamente.
+      `;
+    }
+
+    function openSchemaModal() {
+      document.getElementById('erd-modal').classList.add('active');
+    }
+
+    function closeSchemaModal() {
+      document.getElementById('erd-modal').classList.remove('active');
+    }
+
+    function adjustStock(rowIndex, amount) {
+      let current = parseInt(sqlQueries[0].rows[rowIndex][5]);
+      current += amount;
+      sqlQueries[0].rows[rowIndex][5] = current.toString();
+      if (current > 15) {
+        sqlQueries[0].rows[rowIndex][7] = "<span style='color:#34d399; font-weight:bold;'>ÓPTIMO</span>";
+      }
+      runQuery(0);
+      alert(`✅ UPDATE LotesMedicamentos SET StockDisponible = ${current} WHERE Id = ${rowIndex + 1};\nStock reabastecido exitosamente.`);
+    }
+
+    function toggleTheme() {
+      f_theme = f_theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', f_theme);
+      localStorage.setItem('theme', f_theme);
+      document.getElementById('btn-theme').textContent = f_theme === 'dark' ? f_i18n[f_lang].btnNight : f_i18n[f_lang].btnDay;
+    }
+
+    function toggleLang() {
+      f_lang = f_lang === 'es' ? 'en' : 'es';
+      localStorage.setItem('lang', f_lang);
+      applyFLang();
+    }
+
+    function applyFLang() {
+      const d = f_i18n[f_lang];
+      document.getElementById('btn-lang').textContent = f_lang === 'es' ? '🇪🇸 ES' : '🇺🇸 EN';
+      document.getElementById('btn-theme').textContent = f_theme === 'dark' ? d.btnNight : d.btnDay;
+      document.getElementById('txt-back').textContent = d.back;
+      document.getElementById('btn-schema').textContent = d.btnSchema;
+      document.getElementById('txt-kpi-1').textContent = d.kpi1;
+      document.getElementById('txt-kpi-2').textContent = d.kpi2;
+      document.getElementById('txt-kpi-3').textContent = d.kpi3;
+      document.getElementById('txt-kpi-4').textContent = d.kpi4;
+      document.getElementById('stab-queries').textContent = d.stabQueries;
+      document.getElementById('stab-plan').textContent = d.stabPlan;
+      document.getElementById('stab-acid').textContent = d.stabAcid;
+      document.getElementById('txt-sql-heading').textContent = d.sqlHeading;
+      document.getElementById('txt-form-heading').textContent = d.formHeading;
+      document.getElementById('txt-form-sub').textContent = d.formSub;
+      document.getElementById('lbl-name').textContent = d.lblName;
+      document.getElementById('lbl-active').textContent = d.lblActive;
+      document.getElementById('lbl-stock').textContent = d.lblStock;
+      document.getElementById('btn-submit-med').textContent = d.btnSubmit;
+      document.getElementById('txt-plan-title').textContent = d.planTitle;
+      document.getElementById('txt-plan-sub').textContent = d.planSub;
+      document.getElementById('txt-acid-title').textContent = d.acidTitle;
+      document.getElementById('txt-acid-sub').textContent = d.acidSub;
+      document.getElementById('txt-erd-title').textContent = d.erdTitle;
+      document.getElementById('txt-erd-sub').textContent = d.erdSub;
+      runQuery(0);
+    }
+
+    function runQuery(idx) {
+      document.querySelectorAll('.sql-tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+      const q = sqlQueries[idx];
+      document.getElementById('sql-code-display').textContent = q.sql;
+      document.getElementById('sql-rows-info').textContent = f_i18n[f_lang].resInfo + `${q.rows.length} registros.`;
+
+      const thead = document.getElementById('result-thead');
+      const tbody = document.getElementById('result-tbody');
+      thead.innerHTML = '<tr>' + q.headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+      tbody.innerHTML = q.rows.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('');
+    }
+
+    document.getElementById('add-med-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('in-name').value;
+      const act = document.getElementById('in-active').value;
+      const stock = document.getElementById('in-stock').value;
+
+      sqlQueries[0].rows.unshift([
+        "7702" + Math.floor(1000 + Math.random() * 9000),
+        name,
+        act,
+        "Genfar Labs",
+        "LT-" + Math.floor(1000 + Math.random() * 9000),
+        stock,
+        "2028-10-15",
+        "<span style='color:#34d399; font-weight:bold;'>ÓPTIMO</span>",
+        "<button onclick='alert(\"Stock ya actualizado\")' style='background:#7c3aed;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;'>Reabastecido</button>"
+      ]);
+
+      alert(`✅ ¡Transacción T-SQL completada!\nINSERT INTO Medicamentos...\nINSERT INTO LotesMedicamentos (Stock = ${stock})\nCOMMIT TRANSACTION;`);
+      document.getElementById('add-med-form').reset();
+      runQuery(0);
+    });
+
+    // ==========================================
+    // PHARMLY DATA & GESTIÓN DE PRODUCTOS (FOTO 2)
+    // ==========================================
+    const pharmlyProducts = [
+      { id: '#001', name: 'Paracetamol 500mg', cat: 'Analgésicos', qty: 120, price: '$5.00', exp: '15-03-2025', status: 'in-stock' },
+      { id: '#002', name: 'Amoxicilina 250mg', cat: 'Antibióticos', qty: 45, price: '$7.50', exp: '01-12-2024', status: 'low-stock' },
+      { id: '#003', name: 'Ibuprofeno 200mg', cat: 'Analgésicos', qty: 0, price: '$6.00', exp: '15-11-2023', status: 'out-stock' },
+      { id: '#004', name: 'Cetirizina 10mg', cat: 'Alergias', qty: 150, price: '$3.50', exp: '30-06-2026', status: 'in-stock' },
+      { id: '#005', name: 'Insulina NPH 100 UI', cat: 'Diabetes', qty: 18, price: '$22.00', exp: '10-08-2025', status: 'low-stock' },
+      { id: '#006', name: 'Vitamina C + Zinc', cat: 'Vitaminas', qty: 210, price: '$8.20', exp: '20-04-2027', status: 'in-stock' },
+      { id: '#007', name: 'Aciclovir 400mg', cat: 'Antivirales', qty: 50, price: '$12.00', exp: '14-01-2025', status: 'in-stock' },
+      { id: '#008', name: 'Losartán Potásico 50mg', cat: 'Cardiovascular', qty: 80, price: '$9.50', exp: '05-09-2026', status: 'in-stock' },
+      { id: '#009', name: 'Salbutamol Inhalador 100mcg', cat: 'Respiratorio', qty: 55, price: '$14.00', exp: '12-10-2025', status: 'in-stock' }
+    ];
+
+    let activePharmlyCat = 'all';
+
+    function renderPharmlyTable(list) {
+      const items = list || getFilteredPharmlyList();
+      const tbody = document.getElementById('pharmly-table-body');
+      if (!tbody) return;
+      if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2.5rem; color: var(--f-muted);">No hay medicamentos que coincidan con la categoría o búsqueda.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = items.map(p => {
+        let badgeText = 'En stock';
+        let badgeColor = '#10b981';
+        let badgeBg = 'rgba(16, 185, 129, 0.15)';
+        if (p.status === 'low-stock' || (p.qty > 0 && p.qty <= 20)) {
+          badgeText = 'Stock bajo';
+          badgeColor = '#f59e0b';
+          badgeBg = 'rgba(245, 158, 11, 0.15)';
+        } else if (p.status === 'out-stock' || p.qty === 0) {
+          badgeText = 'Sin stock';
+          badgeColor = '#f43f5e';
+          badgeBg = 'rgba(244, 63, 94, 0.15)';
+        }
+
+        return `
+          <tr>
+            <td style="font-family: 'JetBrains Mono'; font-weight: 700; color: #c7f284;">${p.id}</td>
+            <td><strong>${p.name}</strong></td>
+            <td><span style="background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.78rem;">${p.cat}</span></td>
+            <td>${p.qty} Unidades</td>
+            <td style="font-weight: 700; color: #10b981;">${p.price}</td>
+            <td style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: ${p.qty === 0 ? '#f43f5e' : 'var(--f-muted)'};">${p.exp}</td>
+            <td>
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem; border-radius: 999px;">
+                ${badgeText}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 0.4rem;">
+                <button onclick="restockPharmlyItem('${p.id}')" title="Reabastecer stock +50" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 800;">+50</button>
+                <button onclick="deletePharmlyItem('${p.id}')" title="Eliminar medicamento" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getFilteredPharmlyList() {
+      const query = (document.getElementById('pharmly-search')?.value || '').toLowerCase();
+      return pharmlyProducts.filter(p => {
+        const matchesCat = activePharmlyCat === 'all' || p.cat.toLowerCase() === activePharmlyCat.toLowerCase();
+        const matchesQuery = p.name.toLowerCase().includes(query) || p.id.toLowerCase().includes(query) || p.cat.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+    }
+
+    function filterPharmlyCat(cat, btn) {
+      activePharmlyCat = cat;
+      document.querySelectorAll('#pharmly-chips .sql-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.includes(cat) || (cat === 'all' && b.textContent.includes('Todos')));
+      });
+      renderPharmlyTable();
+    }
+
+    function searchPharmlyTable() {
+      renderPharmlyTable();
+    }
+
+    function restockPharmlyItem(id) {
+      const item = pharmlyProducts.find(p => p.id === id);
+      if (item) {
+        item.qty += 50;
+        item.status = 'in-stock';
+        renderPharmlyTable();
+      }
+    }
+
+    function deletePharmlyItem(id) {
+      const idx = pharmlyProducts.findIndex(p => p.id === id);
+      if (idx !== -1) {
+        pharmlyProducts.splice(idx, 1);
+        renderPharmlyTable();
+      }
+    }
+
+    function openPharmlyAddModal() {
+      const modal = document.getElementById('modal-pharmly-add');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closePharmlyAddModal() {
+      const modal = document.getElementById('modal-pharmly-add');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function handlePharmlyAddSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('ph-in-name').value;
+      const cat = document.getElementById('ph-in-cat').value;
+      const qty = parseInt(document.getElementById('ph-in-qty').value) || 1;
+      const price = document.getElementById('ph-in-price').value;
+      const exp = document.getElementById('ph-in-exp').value;
+
+      const nextId = '#' + String(pharmlyProducts.length + 1).padStart(3, '0');
+      pharmlyProducts.unshift({
+        id: nextId,
+        name: name,
+        cat: cat,
+        qty: qty,
+        price: price.startsWith('$') ? price : '$' + price,
+        exp: exp,
+        status: qty > 20 ? 'in-stock' : 'low-stock'
+      });
+
+      closePharmlyAddModal();
+      document.getElementById('form-pharmly-new').reset();
+      renderPharmlyTable();
+    }
+
+    document.documentElement.setAttribute('data-theme', f_theme);
+    applyFLang();
+    renderPharmlyTable();
+  </script>
+
+  <!-- MODAL AGREGAR MEDICAMENTO PHARMLY -->
+  <div id="modal-pharmly-add" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: var(--f-card); border: 1px solid var(--f-border); border-radius: 18px; padding: 2rem; width: 90%; max-width: 500px; box-shadow: 0 25px 60px rgba(0,0,0,0.6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="margin: 0; font-weight: 800; color: #c7f284; font-size: 1.25rem;">🌿 Registrar Nuevo Medicamento (Pharmly)</h3>
+        <button onclick="closePharmlyAddModal()" style="background: none; border: none; color: var(--f-muted); font-size: 1.25rem; cursor: pointer;">✕</button>
+      </div>
+      <form id="form-pharmly-new" onsubmit="handlePharmlyAddSubmit(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--f-muted); margin-bottom: 0.35rem;">Nombre Comercial y Dosis</label>
+          <input type="text" id="ph-in-name" required placeholder="Ej: Loratadina 10mg" style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--f-muted); margin-bottom: 0.35rem;">Categoría</label>
+            <select id="ph-in-cat" style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none;">
+              <option value="Antibióticos">Antibióticos</option>
+              <option value="Analgésicos">Analgésicos</option>
+              <option value="Vitaminas">Vitaminas &amp; Supl.</option>
+              <option value="Antivirales">Antivirales</option>
+              <option value="Diabetes">Diabetes</option>
+              <option value="Cardiovascular">Cardiovascular</option>
+              <option value="Alergias">Alergias</option>
+              <option value="Respiratorio">Respiratorio</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--f-muted); margin-bottom: 0.35rem;">Cantidad Inicial</label>
+            <input type="number" id="ph-in-qty" min="1" value="50" required style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--f-muted); margin-bottom: 0.35rem;">Precio Unitario ($)</label>
+            <input type="text" id="ph-in-price" value="$6.50" required style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--f-muted); margin-bottom: 0.35rem;">Fecha Caducidad</label>
+            <input type="date" id="ph-in-exp" value="2026-12-31" required style="width: 100%; box-sizing: border-box; background: var(--f-bg); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.65rem 0.85rem; border-radius: 8px; outline: none;">
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" onclick="closePharmlyAddModal()" style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--f-border); color: var(--f-text); padding: 0.75rem; border-radius: 8px; font-weight: 700; cursor: pointer;">Cancelar</button>
+          <button type="submit" style="flex: 1; background: #c7f284; border: none; color: #062320; padding: 0.75rem; border-radius: 8px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(199, 242, 132, 0.4);">Guardar Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

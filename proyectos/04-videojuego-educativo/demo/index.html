@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathQuest 2D | Videojuego Educativo Unity & C# Senior Demo</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --g-bg: #0c0a1a;
+      --g-card: #141126;
+      --g-border: rgba(168, 85, 247, 0.25);
+      --g-text: #f8fafc;
+      --g-muted: #cbd5e1;
+      --g-purple: #8b5cf6;
+      --g-violet: #7c3aed;
+      --g-fuchsia: #c084fc;
+      --g-emerald: #10b981;
+      --g-rose: #f43f5e;
+      --g-amber: #fbbf24;
+    }
+    [data-theme="light"] {
+      --g-bg: #f8f6ff;
+      --g-card: #ffffff;
+      --g-border: #e5dbff;
+      --g-text: #1e113f;
+      --g-muted: #564875;
+      --g-purple: #7c3aed;
+      --g-violet: #6d28d9;
+      --g-fuchsia: #a855f7;
+      --g-emerald: #059669;
+      --g-rose: #e11d48;
+      --g-amber: #d97706;
+    }
+    body {
+      background-color: var(--g-bg);
+      color: var(--g-text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+    .app-nav {
+      background: var(--g-card);
+      border-bottom: 1px solid var(--g-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+    .game-arena {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem 3rem;
+      position: relative;
+    }
+    #game-canvas {
+      background: #090714;
+      border: 3px solid var(--g-purple);
+      border-radius: 18px;
+      box-shadow: 0 0 45px rgba(139, 92, 246, 0.35);
+      max-width: 100%;
+      image-rendering: pixelated;
+    }
+    .hud-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 800px;
+      max-width: 100%;
+      margin-bottom: 0.75rem;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.78rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .hud-controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 800px;
+      max-width: 100%;
+      margin-top: 0.75rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .overlay-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 17, 38, 0.96);
+      border: 2px solid var(--g-purple);
+      border-radius: 20px;
+      padding: 2.25rem;
+      width: 90%;
+      max-width: 490px;
+      text-align: center;
+      box-shadow: 0 0 55px rgba(124, 58, 237, 0.6);
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(12px);
+    }
+    .quiz-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-top: 1.5rem;
+    }
+    .opt-btn {
+      background: #231c47;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: white;
+      padding: 0.85rem;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .opt-btn:hover {
+      background: var(--g-purple);
+      color: white;
+      transform: translateY(-2px);
+    }
+    .opt-btn.correct {
+      background: #10b981 !important;
+      border-color: #10b981 !important;
+    }
+    .opt-btn.incorrect {
+      background: #ef4444 !important;
+      border-color: #ef4444 !important;
+    }
+    .touch-controls {
+      display: none;
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    @media (max-width: 800px) {
+      .touch-controls { display: flex; }
+    }
+    .t-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #1c1738;
+      border: 2px solid var(--g-purple);
+      color: white;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .telemetry-card {
+      width: 800px;
+      max-width: 100%;
+      background: #06040d;
+      border: 1px solid var(--g-border);
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      margin-top: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="app-nav">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <a href="../../../index.html" style="color: var(--g-fuchsia); font-weight: 800; text-decoration: none; font-size: 0.95rem;">
+        ← <span id="txt-back">Volver al Portafolio</span>
+      </a>
+      <div style="font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🎮</span>
+        <span>MathQuest 2D — Unity C# Game Engine &amp; Diagnostics</span>
+      </div>
+      <span style="font-size: 0.75rem; background: rgba(168,85,247,0.15); color: var(--g-fuchsia); padding: 0.25rem 0.65rem; border-radius: 999px; font-weight: 700;">
+        🎮 Videojuego Educativo en Unity &amp; C#
+      </span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button onclick="toggleAudio()" class="control-btn" id="btn-audio" style="border-color: var(--g-purple);">
+        🔊 <span id="txt-audio-lbl">Sonido: ON</span>
+      </button>
+      <button onclick="toggleTheme()" class="control-btn" id="btn-theme">🌙 Noche</button>
+      <button onclick="toggleLang()" class="control-btn" id="btn-lang">🇪🇸 ES</button>
+    </div>
+  </nav>
+
+  <div class="game-arena">
+    <!-- HUD -->
+    <div class="hud-bar">
+      <span style="color: #fbbf24;" id="txt-score">SCORE: 0</span>
+      <span style="color: var(--g-fuchsia);" id="txt-gems-count">GEMS: 0 / 4</span>
+      <span style="color: #f43f5e;" id="txt-lives">LIVES: ❤️❤️❤️</span>
+      <span style="color: #38bdf8;" id="txt-level-mode">DIFFICULTY: SENIOR</span>
+    </div>
+
+    <!-- CANVAS DEL JUEGO -->
+    <canvas id="game-canvas" width="800" height="420"></canvas>
+
+    <!-- BARRA DE CONTROLES Y OPCIONES -->
+    <div class="hud-controls-bar">
+      <div style="color: var(--g-muted); font-size: 0.85rem;">
+        <span id="txt-keys">Moverse: <strong>A / D</strong> o <strong>← / →</strong></span> | 
+        <span id="txt-jump">Saltar: <strong>ESPACIO</strong> o <strong>W</strong></span>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <label style="font-size: 0.8rem; color: var(--g-muted); font-weight: 700;" id="lbl-diff">Nivel:</label>
+        <select id="diff-select" onchange="changeDifficulty(this.value)" style="background: var(--g-card); color: var(--g-text); border: 1px solid var(--g-border); padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.8rem;">
+          <option value="senior">Senior Dev (Algoritmos / Big-O / Bitwise)</option>
+          <option value="math">Fundamentos (Álgebra / Lógica)</option>
+        </select>
+        <button onclick="toggleTelemetry()" class="control-btn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+          🔍 <span id="btn-telemetry">Telemetría C#</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PANEL DE TELEMETRÍA DEL MOTOR UNITY C# -->
+    <div class="telemetry-card" id="telemetry-panel">
+      <div><span style="color: var(--g-muted);">Engine State:</span> <strong id="tel-state" style="color: #10b981;">PLAYING</strong></div>
+      <div><span style="color: var(--g-muted);">FPS:</span> <strong id="tel-fps" style="color: #fbbf24;">60.0</strong> (<span id="tel-dt">16.6ms</span>)</div>
+      <div><span style="color: var(--g-muted);">Player Vector2:</span> <strong id="tel-pos" style="color: var(--g-fuchsia);">(60, 310)</strong></div>
+      <div><span style="color: var(--g-muted);">Velocity:</span> <strong id="tel-vel" style="color: #38bdf8;">vx: 0, vy: 0</strong></div>
+      <div><span style="color: var(--g-muted);">Grounded Check:</span> <strong id="tel-ground" style="color: #10b981;">TRUE</strong></div>
+      <div><span style="color: var(--g-muted);">Active Colliders:</span> <strong style="color: var(--g-purple);">BoxCollider2D (x5)</strong></div>
+    </div>
+
+    <!-- BOTONES TÁCTILES MÓVILES -->
+    <div class="touch-controls">
+      <button class="t-btn" id="btn-left">◀</button>
+      <button class="t-btn" id="btn-jump">▲</button>
+      <button class="t-btn" id="btn-right">▶</button>
+    </div>
+
+    <!-- MODAL 1: RETO EDUCATIVO VALIDADO -->
+    <div class="overlay-box" id="quiz-modal">
+      <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">💎</div>
+      <h3 style="color: white; margin-bottom: 0.5rem; font-weight: 800;" id="txt-quiz-title">¡Desafío Educativo Activado!</h3>
+      <p style="color: #cbd5e1; font-size: 1.05rem; margin-bottom: 1rem; line-height: 1.5;" id="quiz-question-text"></p>
+      <div class="quiz-options-grid" id="quiz-buttons-grid"></div>
+    </div>
+
+    <!-- MODAL 2: GAME OVER -->
+    <div class="overlay-box" id="game-over-modal" style="border-color: #f43f5e;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💀</div>
+      <h2 style="color: #f43f5e; font-weight: 800; font-family: 'Press Start 2P'; font-size: 1.2rem; margin-bottom: 1rem;">GAME OVER</h2>
+      <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 1.5rem;" id="txt-game-over-desc">
+        Te has quedado sin vidas. ¡Repasa la lógica y vuelve a intentarlo!
+      </p>
+      <button onclick="resetGame()" style="background: #f43f5e; color: white; border: none; padding: 0.85rem 1.8rem; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer;">
+        🔄 <span id="btn-restart">Reintentar Nivel</span>
+      </button>
+    </div>
+
+    <!-- MODAL 3: VICTORIA -->
+    <div class="overlay-box" id="victory-modal" style="border-color: #10b981;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🏆</div>
+      <h2 style="color: #10b981; font-weight: 800; font-family: 'Press Start 2P'; font-size: 1.15rem; margin-bottom: 1rem;">¡VICTORIA!</h2>
+      <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 1.5rem;" id="txt-victory-desc">
+        ¡Has resuelto todos los desafíos algorítmicos y lógicos! Portal dimensional atravesado con éxito.
+      </p>
+      <div style="font-size: 1.1rem; font-weight: 800; color: #fbbf24; margin-bottom: 1.5rem;" id="final-score-text">
+        PUNTUACIÓN FINAL: 1000 PTS
+      </div>
+      <button onclick="resetGame()" style="background: var(--gradient-primary); color: white; border: none; padding: 0.85rem 1.8rem; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer;">
+        ✨ <span id="btn-play-again">Jugar de Nuevo</span>
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    const g_i18n = {
+      es: {
+        back: "Volver al Portafolio",
+        score: "SCORE: ",
+        gems: "GEMS: ",
+        lives: "LIVES: ",
+        keys: "Moverse: A / D o ← / →",
+        jump: "Saltar: ESPACIO o W",
+        quizTitle: "¡Desafío Educativo Activado!",
+        gameOverDesc: "Te has quedado sin vidas. ¡Repasa la lógica y vuelve a intentarlo!",
+        btnRestart: "Reintentar Nivel",
+        victoryDesc: "¡Has resuelto todos los desafíos algorítmicos y lógicos! Portal dimensional atravesado con éxito.",
+        btnPlayAgain: "Jugar de Nuevo",
+        btnNight: "🌙 Noche",
+        btnDay: "☀️ Día",
+        soundOn: "Sonido: ON",
+        soundOff: "Sonido: OFF",
+        btnTelemetry: "Telemetría C#",
+        finalScore: "PUNTUACIÓN FINAL: "
+      },
+      en: {
+        back: "Back to Portfolio",
+        score: "SCORE: ",
+        gems: "GEMS: ",
+        lives: "LIVES: ",
+        keys: "Move: A / D or ← / →",
+        jump: "Jump: SPACE or W",
+        quizTitle: "Educational Challenge Activated!",
+        gameOverDesc: "You ran out of lives. Sharpen your logic and try again!",
+        btnRestart: "Retry Level",
+        victoryDesc: "You solved all algorithmic and logic challenges! Dimensional portal entered successfully.",
+        btnPlayAgain: "Play Again",
+        btnNight: "🌙 Night",
+        btnDay: "☀️ Day",
+        soundOn: "Sound: ON",
+        soundOff: "Sound: OFF",
+        btnTelemetry: "C# Telemetry",
+        finalScore: "FINAL SCORE: "
+      }
+    };
+
+    let g_lang = localStorage.getItem('lang') || 'es';
+    let g_theme = localStorage.getItem('theme') || 'dark';
+    let audioEnabled = true;
+    let audioCtx = null;
+    let difficulty = 'senior';
+
+    // SINTETIZADOR WEB AUDIO API 8-BIT
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type, duration, delay = 0) {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + delay);
+        osc.stop(audioCtx.currentTime + delay + duration);
+      } catch (e) {}
+    }
+
+    function soundJump() {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.07, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch(e) {}
+    }
+
+    function soundGem() {
+      playTone(523.25, 'triangle', 0.08, 0);     // C5
+      playTone(659.25, 'triangle', 0.08, 0.07);  // E5
+      playTone(783.99, 'triangle', 0.12, 0.14);  // G5
+      playTone(1046.50, 'triangle', 0.20, 0.21); // C6
+    }
+
+    function soundCorrect() {
+      playTone(440, 'sine', 0.1, 0);
+      playTone(554.37, 'sine', 0.1, 0.08);
+      playTone(659.25, 'sine', 0.25, 0.16);
+    }
+
+    function soundWrong() {
+      playTone(180, 'sawtooth', 0.2, 0);
+      playTone(120, 'sawtooth', 0.3, 0.15);
+    }
+
+    function soundGameOver() {
+      playTone(300, 'sawtooth', 0.2, 0);
+      playTone(250, 'sawtooth', 0.2, 0.2);
+      playTone(200, 'sawtooth', 0.2, 0.4);
+      playTone(150, 'sawtooth', 0.5, 0.6);
+    }
+
+    function soundVictory() {
+      playTone(523.25, 'triangle', 0.12, 0);
+      playTone(659.25, 'triangle', 0.12, 0.12);
+      playTone(783.99, 'triangle', 0.12, 0.24);
+      playTone(1046.50, 'triangle', 0.4, 0.36);
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const lbl = audioEnabled ? g_i18n[g_lang].soundOn : g_i18n[g_lang].soundOff;
+      document.getElementById('btn-audio').innerHTML = (audioEnabled ? '🔊 ' : '🔇 ') + `<span id="txt-audio-lbl">${lbl}</span>`;
+      if (audioEnabled) initAudio();
+    }
+
+    function toggleTelemetry() {
+      const panel = document.getElementById('telemetry-panel');
+      panel.style.display = panel.style.display === 'none' ? 'grid' : 'none';
+    }
+
+    function changeDifficulty(val) {
+      difficulty = val;
+      document.getElementById('txt-level-mode').textContent = `DIFFICULTY: ${val.toUpperCase()}`;
+      resetGame();
+    }
+
+    // PREGUNTAS POR DIFICULTAD
+    const questionBanks = {
+      senior: [
+        {
+          q_es: "¿Cuál es la complejidad temporal O(n) del algoritmo QuickSort en el peor de los casos (caso degenerado)?",
+          q_en: "What is the worst-case Big-O time complexity of the QuickSort algorithm?",
+          opts: ["O(n log n)", "O(n²)", "O(1)", "O(n)"],
+          ans: 1
+        },
+        {
+          q_es: "En C#, ¿cuál es el resultado de la operación bit a bit: <code>(5 &lt;&lt; 2) | 1</code>?",
+          q_en: "In C#, what is the result of the bitwise expression: <code>(5 &lt;&lt; 2) | 1</code>?",
+          opts: ["21", "20", "11", "15"],
+          ans: 0
+        },
+        {
+          q_es: "¿Qué principio SOLID se viola al forzar a una clase a implementar métodos que no utiliza?",
+          q_en: "Which SOLID principle is violated when forcing a class to implement methods it does not use?",
+          opts: ["Single Responsibility", "Open/Closed", "Interface Segregation", "Liskov Substitution"],
+          ans: 2
+        },
+        {
+          q_es: "En bases de datos relacionales, ¿qué nivel de aislamiento previene lecturas fantasma (Phantom Reads)?",
+          q_en: "In relational databases, which isolation level prevents Phantom Reads?",
+          opts: ["Read Uncommitted", "Read Committed", "Repeatable Read", "Serializable"],
+          ans: 3
+        }
+      ],
+      math: [
+        {
+          q_es: "¿Cuál es la derivada de f(x) = 3x² + 5x - 7?",
+          q_en: "What is the derivative of f(x) = 3x² + 5x - 7?",
+          opts: ["6x + 5", "3x + 5", "6x² + 5", "6x - 7"],
+          ans: 0
+        },
+        {
+          q_es: "¿Cuál es el valor binario del número decimal 25?",
+          q_en: "What is the binary representation of decimal 25?",
+          opts: ["11001", "10101", "11100", "10011"],
+          ans: 0
+        },
+        {
+          q_es: "Si un triángulo tiene catetos de 6cm y 8cm, ¿cuánto mide su hipotenusa (Teorema de Pitágoras)?",
+          q_en: "If a right triangle has legs of 6cm and 8cm, what is its hypotenuse?",
+          opts: ["14cm", "10cm", "12cm", "9cm"],
+          ans: 1
+        },
+        {
+          q_es: "Resuelve la ecuación lineal: 4x - 8 = 16. ¿Cuánto vale x?",
+          q_en: "Solve the linear equation: 4x - 8 = 16. What is x?",
+          opts: ["4", "5", "6", "8"],
+          ans: 2
+        }
+      ]
+    };
+
+    // SISTEMA DE PARTICULAS
+    const particles = [];
+    function spawnParticles(x, y, color, count = 16) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 4;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: 2 + Math.random() * 4,
+          color: color,
+          alpha: 1.0,
+          decay: 0.02 + Math.random() * 0.03
+        });
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.08; // Gravedad
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    function drawParticles(ctx) {
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // CANVAS & MOTOR 2D
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let state = 'PLAYING'; // PLAYING, IN_QUIZ, GAME_OVER, VICTORY
+    let score = 0;
+    let lives = 3;
+    let gemsCollected = 0;
+    let activeGemIndex = -1;
+
+    let lastFrameTime = performance.now();
+    let fps = 60;
+
+    const player = {
+      x: 60,
+      y: 320,
+      w: 24,
+      h: 32,
+      vx: 0,
+      vy: 0,
+      speed: 4.2,
+      jumpForce: -10.5,
+      grounded: false
+    };
+
+    const keys = { left: false, right: false, up: false };
+
+    const platforms = [
+      { x: 0, y: 380, w: 800, h: 40 },
+      { x: 120, y: 300, w: 140, h: 16 },
+      { x: 310, y: 240, w: 140, h: 16 },
+      { x: 500, y: 190, w: 140, h: 16 },
+      { x: 230, y: 140, w: 140, h: 16 },
+      { x: 670, y: 280, w: 110, h: 16 }
+    ];
+
+    let gems = [
+      { x: 180, y: 265, collected: false, color: '#c084fc' },
+      { x: 370, y: 205, collected: false, color: '#38bdf8' },
+      { x: 560, y: 155, collected: false, color: '#fbbf24' },
+      { x: 290, y: 105, collected: false, color: '#10b981' }
+    ];
+
+    const portal = { x: 720, y: 215, w: 36, h: 65, active: false };
+
+    // INPUT LISTENERS
+    window.addEventListener('keydown', (e) => {
+      if (state !== 'PLAYING') return;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+      if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && player.grounded) {
+        player.vy = player.jumpForce;
+        player.grounded = false;
+        soundJump();
+        spawnParticles(player.x + player.w/2, player.y + player.h, '#a855f7', 8);
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+    });
+
+    // Touch handlers
+    document.getElementById('btn-left').addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
+    document.getElementById('btn-left').addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
+    document.getElementById('btn-right').addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
+    document.getElementById('btn-right').addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
+    document.getElementById('btn-jump').addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (player.grounded && state === 'PLAYING') {
+        player.vy = player.jumpForce;
+        player.grounded = false;
+        soundJump();
+      }
+    });
+
+    function resetGame() {
+      state = 'PLAYING';
+      score = 0;
+      lives = 3;
+      gemsCollected = 0;
+      activeGemIndex = -1;
+      player.x = 60;
+      player.y = 320;
+      player.vx = 0;
+      player.vy = 0;
+      gems.forEach(g => g.collected = false);
+      portal.active = false;
+      particles.length = 0;
+
+      document.getElementById('quiz-modal').style.display = 'none';
+      document.getElementById('game-over-modal').style.display = 'none';
+      document.getElementById('victory-modal').style.display = 'none';
+
+      updateHUD();
+    }
+
+    function updateHUD() {
+      document.getElementById('txt-score').textContent = g_i18n[g_lang].score + score;
+      document.getElementById('txt-gems-count').textContent = g_i18n[g_lang].gems + `${gemsCollected} / 4`;
+      let hearts = '';
+      for (let i = 0; i < lives; i++) hearts += '❤️';
+      document.getElementById('txt-lives').textContent = g_i18n[g_lang].lives + (hearts || '💀');
+
+      // Update Telemetry
+      document.getElementById('tel-state').textContent = state;
+      document.getElementById('tel-pos').textContent = `(${Math.round(player.x)}, ${Math.round(player.y)})`;
+      document.getElementById('tel-vel').textContent = `vx: ${player.vx.toFixed(1)}, vy: ${player.vy.toFixed(1)}`;
+      document.getElementById('tel-ground').textContent = player.grounded ? 'TRUE' : 'FALSE';
+      document.getElementById('tel-ground').style.color = player.grounded ? '#10b981' : '#f43f5e';
+    }
+
+    function openQuiz(idx) {
+      state = 'IN_QUIZ';
+      activeGemIndex = idx;
+      keys.left = false;
+      keys.right = false;
+      player.vx = 0;
+
+      soundGem();
+
+      const bank = questionBanks[difficulty];
+      const qData = bank[idx % bank.length];
+      const qText = g_lang === 'es' ? qData.q_es : qData.q_en;
+
+      document.getElementById('quiz-question-text').innerHTML = qText;
+      const btnGrid = document.getElementById('quiz-buttons-grid');
+      btnGrid.innerHTML = '';
+
+      qData.opts.forEach((opt, optIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerHTML = opt;
+        btn.onclick = () => answerQuiz(optIdx, qData.ans);
+        btnGrid.appendChild(btn);
+      });
+
+      document.getElementById('quiz-modal').style.display = 'block';
+      updateHUD();
+    }
+
+    function answerQuiz(selected, correct) {
+      const btns = document.querySelectorAll('.opt-btn');
+      btns.forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct) b.classList.add('correct');
+        else if (i === selected) b.classList.add('incorrect');
+      });
+
+      if (selected === correct) {
+        soundCorrect();
+        score += 250;
+        gems[activeGemIndex].collected = true;
+        gemsCollected++;
+        spawnParticles(player.x + player.w/2, player.y + player.h/2, '#10b981', 30);
+
+        if (gemsCollected >= 4) {
+          portal.active = true;
+          spawnParticles(portal.x + portal.w/2, portal.y + portal.h/2, '#c084fc', 40);
+        }
+
+        setTimeout(() => {
+          document.getElementById('quiz-modal').style.display = 'none';
+          state = 'PLAYING';
+          updateHUD();
+        }, 1100);
+      } else {
+        soundWrong();
+        lives--;
+        spawnParticles(player.x + player.w/2, player.y + player.h/2, '#f43f5e', 20);
+        updateHUD();
+
+        setTimeout(() => {
+          document.getElementById('quiz-modal').style.display = 'none';
+          if (lives <= 0) {
+            state = 'GAME_OVER';
+            soundGameOver();
+            document.getElementById('game-over-modal').style.display = 'block';
+          } else {
+            state = 'PLAYING';
+          }
+          updateHUD();
+        }, 1200);
+      }
+    }
+
+    // GAME LOOP
+    function gameLoop(now) {
+      const dt = now - lastFrameTime;
+      lastFrameTime = now;
+      fps = Math.round(1000 / (dt || 16.6));
+      document.getElementById('tel-fps').textContent = fps;
+      document.getElementById('tel-dt').textContent = (dt || 16.6).toFixed(1) + 'ms';
+
+      if (state === 'PLAYING') {
+        // Horiz Movement
+        if (keys.left) player.vx = -player.speed;
+        else if (keys.right) player.vx = player.speed;
+        else player.vx = 0;
+
+        player.x += player.vx;
+
+        // Limites horizontales
+        if (player.x < 0) player.x = 0;
+        if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+
+        // Gravedad
+        player.vy += 0.52;
+        player.y += player.vy;
+
+        // Colision con plataformas (AABB One-Way Top)
+        player.grounded = false;
+        for (const p of platforms) {
+          if (
+            player.x + player.w > p.x &&
+            player.x < p.x + p.w &&
+            player.y + player.h >= p.y &&
+            player.y + player.h <= p.y + p.h + player.vy + 2 &&
+            player.vy >= 0
+          ) {
+            player.y = p.y - player.h;
+            player.vy = 0;
+            player.grounded = true;
+          }
+        }
+
+        // Check gem triggers
+        gems.forEach((g, idx) => {
+          if (!g.collected) {
+            const dist = Math.hypot((player.x + player.w/2) - g.x, (player.y + player.h/2) - g.y);
+            if (dist < 26) {
+              openQuiz(idx);
+            }
+          }
+        });
+
+        // Check Portal Trigger
+        if (portal.active) {
+          const pDist = Math.hypot((player.x + player.w/2) - (portal.x + portal.w/2), (player.y + player.h/2) - (portal.y + portal.h/2));
+          if (pDist < 35) {
+            state = 'VICTORY';
+            soundVictory();
+            score += 500;
+            updateHUD();
+            document.getElementById('final-score-text').textContent = g_i18n[g_lang].finalScore + score + ' PTS';
+            document.getElementById('victory-modal').style.display = 'block';
+          }
+        }
+
+        updateHUD();
+      }
+
+      updateParticles();
+      render();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // RENDERIZADO GRAFICO
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fondo Estrellado & Gradiente Púrpura Nocturno
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bgGrad.addColorStop(0, '#0c081e');
+      bgGrad.addColorStop(1, '#05030a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Estrellas sutiles
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      for (let i = 1; i <= 30; i++) {
+        ctx.fillRect((i * 97) % 800, (i * 43) % 360, 2, 2);
+      }
+
+      // Dibujar Plataformas (Glassmorphism Púrpura)
+      for (const p of platforms) {
+        ctx.fillStyle = '#1c1538';
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = '#7c3aed';
+        ctx.fillRect(p.x, p.y, p.w, 3);
+        ctx.fillStyle = 'rgba(168, 85, 247, 0.15)';
+        ctx.fillRect(p.x, p.y + 3, p.w, p.h - 3);
+      }
+
+      // Dibujar Gemas Flotantes con Pulsación Senoidal
+      const time = performance.now() * 0.004;
+      gems.forEach((g) => {
+        if (!g.collected) {
+          const offsetY = Math.sin(time + g.x) * 4;
+          ctx.save();
+          ctx.shadowColor = g.color;
+          ctx.shadowBlur = 15;
+          ctx.fillStyle = g.color;
+          ctx.beginPath();
+          ctx.moveTo(g.x, g.y + offsetY - 10);
+          ctx.lineTo(g.x + 9, g.y + offsetY);
+          ctx.lineTo(g.x, g.y + offsetY + 10);
+          ctx.lineTo(g.x - 9, g.y + offsetY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+
+      // Dibujar Portal Dimensional
+      ctx.save();
+      if (portal.active) {
+        ctx.shadowColor = '#c084fc';
+        ctx.shadowBlur = 25;
+        const pGrad = ctx.createRadialGradient(
+          portal.x + portal.w/2, portal.y + portal.h/2, 5,
+          portal.x + portal.w/2, portal.y + portal.h/2, portal.h/2
+        );
+        pGrad.addColorStop(0, '#ffffff');
+        pGrad.addColorStop(0.4, '#a855f7');
+        pGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = pGrad;
+        ctx.beginPath();
+        ctx.ellipse(portal.x + portal.w/2, portal.y + portal.h/2, portal.w/2, portal.h/2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Portal inactivo
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(portal.x + portal.w/2, portal.y + portal.h/2, portal.w/2, portal.h/2, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Dibujar Particulas
+      drawParticles(ctx);
+
+      // Dibujar Jugador (Pixel Sprite C#)
+      ctx.save();
+      ctx.shadowColor = '#8b5cf6';
+      ctx.shadowBlur = 12;
+      // Cuerpo
+      ctx.fillStyle = '#7c3aed';
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+      // Cabeza / Visor
+      ctx.fillStyle = '#c084fc';
+      ctx.fillRect(player.x + 4, player.y + 4, player.w - 8, 10);
+      // Ojos cian
+      ctx.fillStyle = '#38bdf8';
+      if (keys.left) {
+        ctx.fillRect(player.x + 5, player.y + 7, 3, 3);
+      } else {
+        ctx.fillRect(player.x + player.w - 8, player.y + 7, 3, 3);
+      }
+      ctx.restore();
+    }
+
+    // THEME & I18N
+    function toggleTheme() {
+      g_theme = g_theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', g_theme);
+      localStorage.setItem('theme', g_theme);
+      document.getElementById('btn-theme').textContent = g_theme === 'dark' ? g_i18n[g_lang].btnNight : g_i18n[g_lang].btnDay;
+    }
+
+    function toggleLang() {
+      g_lang = g_lang === 'es' ? 'en' : 'es';
+      localStorage.setItem('lang', g_lang);
+      applyGLang();
+    }
+
+    function applyGLang() {
+      const d = g_i18n[g_lang];
+      document.getElementById('btn-lang').textContent = g_lang === 'es' ? '🇪🇸 ES' : '🇺🇸 EN';
+      document.getElementById('btn-theme').textContent = g_theme === 'dark' ? d.btnNight : d.btnDay;
+      document.getElementById('txt-back').textContent = d.back;
+      document.getElementById('txt-keys').innerHTML = d.keys;
+      document.getElementById('txt-jump').innerHTML = d.jump;
+      document.getElementById('txt-quiz-title').textContent = d.quizTitle;
+      document.getElementById('txt-game-over-desc').textContent = d.gameOverDesc;
+      document.getElementById('btn-restart').textContent = d.btnRestart;
+      document.getElementById('txt-victory-desc').textContent = d.victoryDesc;
+      document.getElementById('btn-play-again').textContent = d.btnPlayAgain;
+      document.getElementById('btn-telemetry').textContent = d.btnTelemetry;
+      const audioLbl = audioEnabled ? d.soundOn : d.soundOff;
+      document.getElementById('txt-audio-lbl').textContent = audioLbl;
+      updateHUD();
+    }
+
+    document.documentElement.setAttribute('data-theme', g_theme);
+    applyGLang();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

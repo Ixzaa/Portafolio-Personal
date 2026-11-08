@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DoctorApp & Flutter Screens | Flutter 3.x Mobile Simulator</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --m-bg: #0c0a1a;
+      --m-card: #141126;
+      --m-border: rgba(168, 85, 247, 0.2);
+      --m-text: #f8fafc;
+      --m-muted: #cbd5e1;
+      --m-purple: #8b5cf6;
+      --m-violet: #7c3aed;
+      --m-fuchsia: #c084fc;
+      --m-emerald: #10b981;
+      --m-rose: #f43f5e;
+      --m-blue: #38bdf8;
+    }
+    [data-theme="light"] {
+      --m-bg: #f8f6ff;
+      --m-card: #ffffff;
+      --m-border: #e5dbff;
+      --m-text: #1e113f;
+      --m-muted: #564875;
+      --m-purple: #7c3aed;
+      --m-violet: #6d28d9;
+      --m-fuchsia: #a855f7;
+      --m-emerald: #059669;
+      --m-rose: #e11d48;
+      --m-blue: #0284c7;
+    }
+    body {
+      background-color: var(--m-bg);
+      color: var(--m-text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+    .app-nav {
+      background: var(--m-card);
+      border-bottom: 1px solid var(--m-border);
+      padding: 0.85rem 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+    .simulator-stage {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem 1rem 3rem;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    /* PANTALLA SELECTOR TABS */
+    .screen-selector-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .screen-pill {
+      background: var(--m-card);
+      border: 1px solid var(--m-border);
+      color: var(--m-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+    .screen-pill.active {
+      background: var(--gradient-primary);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+
+    /* IPHONE FRAME */
+    .smartphone {
+      width: 360px;
+      height: 720px;
+      background: #110d24;
+      border: 12px solid #231c47;
+      border-radius: 46px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(139, 92, 246, 0.25);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .island {
+      width: 110px;
+      height: 25px;
+      background: #090714;
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 20px;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+    .island-cam {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #231c47;
+    }
+    .island-sensor {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #8b5cf6;
+    }
+    .phone-bar {
+      height: 42px;
+      padding: 0 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #94a3b8;
+      z-index: 50;
+    }
+    .phone-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 1.25rem 4.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+    .phone-viewport::-webkit-scrollbar { display: none; }
+
+    .bottom-tabs {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 58px;
+      background: rgba(17, 13, 36, 0.96);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(168, 85, 247, 0.2);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      color: #64748b;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      color: var(--m-fuchsia);
+    }
+
+    .card-gradient {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      border-radius: 20px;
+      padding: 1.25rem;
+      color: white;
+      box-shadow: 0 10px 20px -5px rgba(124, 58, 237, 0.5);
+    }
+    .med-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .med-card.checked {
+      opacity: 0.5;
+      text-decoration: line-through;
+    }
+    .check-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--m-purple);
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: transparent;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    .check-btn.active {
+      background: var(--m-emerald);
+      border-color: var(--m-emerald);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav class="app-nav">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <a href="../../../index.html" style="color: var(--m-fuchsia); font-weight: 800; text-decoration: none; font-size: 0.95rem;">
+        ← <span id="txt-back">Volver al Portafolio</span>
+      </a>
+      <div style="font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>📱</span>
+        <span>DoctorApp &amp; Flutter Screen Gallery</span>
+      </div>
+      <span style="font-size: 0.75rem; background: rgba(168,85,247,0.15); color: var(--m-fuchsia); padding: 0.25rem 0.65rem; border-radius: 999px; font-weight: 700;">
+        👤 Aplicación Móvil en Flutter &amp; Dart
+      </span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button onclick="toggleTheme()" class="control-btn" id="btn-theme">🌙 Noche</button>
+    </div>
+  </nav>
+
+  <!-- SELECTOR DE LAS PANTALLAS DE LA FOTO 3 -->
+  <div style="max-width: 1200px; margin: 1.5rem auto 0; padding: 0 1rem;">
+    <div class="screen-selector-bar">
+      <button class="screen-pill active" onclick="loadScreen('doctor', this)">
+        <span>🏥</span> <span>Telemedicina (DoctorApp Cámara Web)</span>
+      </button>
+      <button class="screen-pill" onclick="loadScreen('dashboard', this)">
+        <span>📊</span> <span>Dashboard Financiero ($4,560)</span>
+      </button>
+      <button class="screen-pill" onclick="loadScreen('tasks', this)">
+        <span>📝</span> <span>Tareas / To-Do (4 Tasks)</span>
+      </button>
+      <button class="screen-pill" onclick="loadScreen('discover', this)">
+        <span>✈️</span> <span>Discover (Destinos Turísticos)</span>
+      </button>
+      <button class="screen-pill" onclick="loadScreen('grocery', this)">
+        <span>🥑</span> <span>Grocery (Supermercado Fresco)</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="simulator-stage">
+    
+    <!-- SMARTPHONE SIMULATOR -->
+    <div class="smartphone">
+      <!-- DYNAMIC ISLAND -->
+      <div class="island">
+        <div class="island-cam"></div>
+        <div class="island-sensor"></div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="phone-bar">
+        <span>09:41</span>
+        <span>5G ● 100%</span>
+      </div>
+
+      <!-- VIEWPORT DINÁMICO DE LA PANTALLA -->
+      <div class="phone-viewport" id="tab-content">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- OVERLAY DE VIDEOLLAMADA WEBRTC CON CÁMARA REAL -->
+      <div class="telemed-overlay" id="telemed-screen" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #070512; z-index: 100; display: none; flex-direction: column; justify-content: space-between; padding: 2.5rem 1rem 1.5rem; text-align: center;">
+        
+        <!-- CABECERA DE LLAMADA -->
+        <div style="position: relative;">
+          <div style="font-size: 0.72rem; color: #10b981; font-weight: 800; letter-spacing: 0.08em;" id="cam-status-badge">
+            🟢 CONEXIÓN TELEMEDICINA ACTIVA
+          </div>
+          <div style="font-family: 'JetBrains Mono'; color: #cbd5e1; font-size: 0.95rem; margin-top: 0.2rem;" id="call-timer">00:00</div>
+          
+          <!-- VENTANA DE LA DOCTORA -->
+          <div style="position: relative; width: 100%; height: 230px; background: #130f2b; border-radius: 18px; margin: 1rem 0; overflow: hidden; border: 1.5px solid rgba(168, 85, 247, 0.4); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: #231c47; border: 3px solid var(--m-purple); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 0.5rem; box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);">
+              👩‍⚕️
+            </div>
+            <div style="font-weight: 800; color: white; font-size: 1rem;">Dra. Elena Ruiz</div>
+            <div style="font-size: 0.75rem; color: #a855f7;">Cardióloga en Consulta Virtual</div>
+
+            <!-- CÁMARA DEL PACIENTE (PIP EN VIVO) -->
+            <div style="position: absolute; bottom: 10px; right: 10px; width: 85px; height: 110px; border-radius: 12px; overflow: hidden; border: 2px solid #10b981; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">
+              <video id="user-cam-video" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+              <div style="position: absolute; bottom: 2px; left: 0; right: 0; font-size: 0.58rem; background: rgba(0,0,0,0.7); color: #fff; font-weight: bold;">TÚ (Cámara)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIÁLOGO CLÍNICO -->
+        <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(168,85,247,0.25); border-radius: 12px; padding: 0.85rem; font-size: 0.78rem; color: #cbd5e1; text-align: left; line-height: 1.45;">
+          <div style="color: #38bdf8; font-weight: 800; margin-bottom: 0.2rem;">💬 Consulta en Vivo:</div>
+          <span id="doc-speech">"Hola, te escucho claramente. ¿Cómo ha estado tu presión arterial y tus horarios de medicamento hoy?"</span>
+        </div>
+
+        <!-- CONTROLES FUNCIONALES -->
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 0.75rem;">
+          <button id="btn-mute-mic" onclick="toggleMuteMic()" title="Silenciar / Activar Micrófono" style="width: 48px; height: 48px; border-radius: 50%; background: #231c47; border: 1px solid rgba(168,85,247,0.4); color: white; font-size: 1.2rem; cursor: pointer; transition: all 0.2s;">
+            🎙️
+          </button>
+          <button onclick="endTelemedicineCall()" title="Finalizar Consulta" style="width: 58px; height: 58px; border-radius: 50%; background: #ef4444; border: none; color: white; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 18px rgba(239, 68, 68, 0.5); transition: transform 0.2s;">
+            📞
+          </button>
+          <button id="btn-toggle-cam" onclick="toggleCamVideo()" title="Pausar / Reanudar Cámara" style="width: 48px; height: 48px; border-radius: 50%; background: #231c47; border: 1px solid rgba(168,85,247,0.4); color: white; font-size: 1.2rem; cursor: pointer; transition: all 0.2s;">
+            📷
+          </button>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAVIGATION TABS -->
+      <div class="bottom-tabs" id="phone-nav-bar">
+        <button class="tab-btn active" onclick="switchInnerTab(0, this)">
+          <span style="font-size: 1.15rem;">🏠</span>
+          <span>Inicio</span>
+        </button>
+        <button class="tab-btn" onclick="switchInnerTab(1, this)">
+          <span style="font-size: 1.15rem;">📅</span>
+          <span>Citas</span>
+        </button>
+        <button class="tab-btn" onclick="switchInnerTab(2, this)">
+          <span style="font-size: 1.15rem;">💊</span>
+          <span>Recetas</span>
+        </button>
+        <button class="tab-btn" onclick="switchInnerTab(3, this)">
+          <span style="font-size: 1.15rem;">👤</span>
+          <span>Perfil</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PANEL LATERAL EXPLICATIVO -->
+    <div style="max-width: 460px;">
+      <div style="color: var(--m-fuchsia); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;">Arquitectura Móvil en Flutter &amp; Dart</div>
+      <h2 style="font-size: 2rem; margin: 0.5rem 0 1rem; font-weight: 800;" id="side-title">DoctorApp &amp; Pantallas Flutter</h2>
+      <p style="color: var(--m-muted); line-height: 1.7; margin-bottom: 1.25rem;" id="side-desc">
+        Demostración interactiva de desarrollo móvil con <strong>Flutter y Dart</strong>. 
+        Incluye tanto los <strong>diseños de interfaz limpios y modernos (Dashboard, Tasks, Discover, Grocery)</strong> como la <strong>funcionalidad completa de videollamada con cámara web real</strong> mediante la API WebRTC / MediaStream del navegador.
+      </p>
+
+      <div style="background: var(--m-card); border: 1px solid var(--m-border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <h4 style="color: var(--m-text); margin-bottom: 0.75rem;">Capacidades Demostradas:</h4>
+        <ul style="color: var(--m-muted); font-size: 0.88rem; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <li><strong>Videoconsulta Real:</strong> Presiona "Iniciar Videollamada" para abrir el stream de cámara en vivo en el visor móvil con silenciador de micrófono y botón de colgar.</li>
+          <li><strong>Pantallas de Flutter:</strong> Explora las 5 vistas disponibles en el menú superior para ver réplicas fieles de componentes UI nativos.</li>
+          <li><strong>Interactividad:</strong> Checklist de tareas dinámico, selector de ritmo cardíaco y contador de hidratación.</li>
+        </ul>
+      </div>
+
+      <a href="../codigo-fuente/" class="btn-primary" style="gap: 0.5rem; font-size: 0.95rem;">
+        <span>📂 Ver Código Fuente Flutter (Dart)</span>
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    let currentScreen = 'doctor';
+    let currentWater = 1500;
+    let currentBPM = 74;
+    let callTimerInterval;
+    let localStream = null;
+
+    // PLANTILLAS HTML DE LAS PANTALLAS (FOTO 3)
+    const screens = {
+      doctor: `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.75rem; color: #94a3b8;">Hola de nuevo,</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: white;">Carlos Mendoza</div>
+          </div>
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--m-purple); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 0.85rem;">
+            CM
+          </div>
+        </div>
+
+        <div class="card-gradient">
+          <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.9;">Próxima Consulta Médica</div>
+          <div style="font-size: 1.05rem; font-weight: 800; margin: 0.35rem 0;">Dra. Elena Ruiz (Cardiología)</div>
+          <div style="font-size: 0.8rem; opacity: 0.95;">Hoy, 10:30 AM • Consultorio Virtual</div>
+          <div style="margin-top: 0.85rem;">
+            <button onclick="startTelemedicineCall()" style="background: white; color: var(--m-violet); border: none; padding: 0.5rem 0.95rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+              <span>📹</span> <span>Iniciar Videollamada Real</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(168,85,247,0.25); border-radius: 16px; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1;">Monitor Cardíaco EKG en Vivo</span>
+            <span style="font-size: 0.75rem; color: #f43f5e; font-weight: 800; font-family: 'JetBrains Mono';" id="bpm-val">74 BPM</span>
+          </div>
+          <canvas id="ekg-canvas" width="310" height="70" style="width: 100%; border-radius: 8px; background: #080613;"></canvas>
+          <div style="margin-top: 0.6rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #94a3b8; font-weight: 700;">
+              <span>Ritmo Cardíaco:</span>
+              <span id="bpm-status" style="color: #10b981;">Ritmo Sinusal Normal</span>
+            </div>
+            <input type="range" min="40" max="160" value="74" id="sl-bpm" oninput="changeBPM(this.value)" style="width: 100%; accent-color: var(--m-purple); margin-top: 0.2rem;">
+          </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(168,85,247,0.2); border-radius: 14px; padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: white;">Hidratación Diaria</div>
+            <div style="font-size: 0.75rem; color: #94a3b8;" id="water-count-text">1,500 / 2,000 ml (6 vasos)</div>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <button onclick="addWater(-250)" style="background: rgba(255,255,255,0.08); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;">-</button>
+            <button onclick="addWater(250)" style="background: var(--m-purple); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer;">+</button>
+          </div>
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: #cbd5e1;">Medicamentos de Hoy</span>
+            <span style="font-size: 0.75rem; color: var(--m-fuchsia); cursor: pointer; font-weight: 700;" onclick="addNewMedPrompt()">+ Agregar</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;" id="med-container">
+            <div class="med-card" id="mc-1">
+              <div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: white;">Losartán 50mg</div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">08:00 AM • Con el desayuno</div>
+              </div>
+              <button class="check-btn" onclick="toggleMed(1)">✓</button>
+            </div>
+            <div class="med-card" id="mc-2">
+              <div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: white;">Omega 3 (1 Cápsula)</div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">01:30 PM • Con el almuerzo</div>
+              </div>
+              <button class="check-btn" onclick="toggleMed(2)">✓</button>
+            </div>
+          </div>
+        </div>
+      `,
+
+      dashboard: `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 1.25rem; color: #94a3b8;">☰</span>
+          <span style="font-size: 1.15rem; color: #94a3b8;">🔍</span>
+        </div>
+
+        <div>
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: white; margin: 0 0 0.5rem;">Dashboard</h2>
+          <div style="font-size: 2.2rem; font-weight: 800; color: white;">$4,560</div>
+          <div style="font-size: 0.8rem; color: #94a3b8;">Total Balance</div>
+        </div>
+
+        <!-- GRÁFICO SMOOTH WAVE (FOTO 3 PANTALLA 1) -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 1.25rem 0.5rem 0.75rem;">
+          <svg width="100%" height="90" viewBox="0 0 280 80">
+            <path d="M 10,50 Q 50,15 90,45 T 170,25 T 250,55" fill="none" stroke="#f59e0b" stroke-width="3" />
+            <path d="M 10,50 Q 50,15 90,45 T 170,25 T 250,55 L 250,80 L 10,80 Z" fill="rgba(245, 158, 11, 0.12)" />
+          </svg>
+          <div style="display: flex; justify-content: space-around; font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-top: 0.5rem;">
+            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+          </div>
+        </div>
+
+        <!-- RECENT TRANSACTIONS (FOTO 3) -->
+        <div>
+          <div style="font-weight: 800; color: white; font-size: 0.95rem; margin-bottom: 0.75rem;">Recent Transactions</div>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+            <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(56, 189, 248, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🛍️</div>
+                <div>
+                  <div style="font-weight: 700; color: white; font-size: 0.88rem;">Shopping</div>
+                  <div style="font-size: 0.72rem; color: #94a3b8;">15 Nov 2026</div>
+                </div>
+              </div>
+              <div style="font-weight: 800; color: white; font-size: 0.95rem;">$120</div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">☕</div>
+                <div>
+                  <div style="font-weight: 700; color: white; font-size: 0.88rem;">Coffee</div>
+                  <div style="font-size: 0.72rem; color: #94a3b8;">15 Nov 2026</div>
+                </div>
+              </div>
+              <div style="font-weight: 800; color: white; font-size: 0.95rem;">$20</div>
+            </div>
+          </div>
+        </div>
+      `,
+
+      tasks: `
+        <div>
+          <h2 style="font-size: 1.6rem; font-weight: 800; color: white; margin: 0 0 0.25rem;">Hello, John</h2>
+          <div style="font-size: 0.85rem; color: #94a3b8;">You have 4 tasks</div>
+        </div>
+
+        <div>
+          <button onclick="addNewTaskPrompt()" style="background: #2563eb; color: white; border: none; padding: 0.75rem 1.25rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);">
+            <span>➕</span> <span>Add task</span>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.65rem;" id="task-list-items">
+          <div class="med-card" onclick="this.classList.toggle('checked')">
+            <span style="font-size: 0.9rem; font-weight: 600; color: white;">Read design</span>
+            <div style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #38bdf8;"></div>
+          </div>
+          <div class="med-card" onclick="this.classList.toggle('checked')">
+            <span style="font-size: 0.9rem; font-weight: 600; color: white;">Create new task</span>
+            <div style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #38bdf8;"></div>
+          </div>
+          <div class="med-card" onclick="this.classList.toggle('checked')">
+            <span style="font-size: 0.9rem; font-weight: 600; color: white;">Finish project</span>
+            <div style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #38bdf8;"></div>
+          </div>
+          <div class="med-card" onclick="this.classList.toggle('checked')">
+            <span style="font-size: 0.9rem; font-weight: 600; color: white;">Call Anna</span>
+            <div style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #38bdf8;"></div>
+          </div>
+        </div>
+      `,
+
+      discover: `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: white; margin: 0;">Discover</h2>
+          <span style="font-size: 1.15rem; color: #94a3b8;">🔍</span>
+        </div>
+
+        <!-- BANNER DISCOVER -->
+        <div style="height: 120px; border-radius: 16px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.35);">
+          🏖️ Tropical Beach Escape
+        </div>
+
+        <div>
+          <div style="font-weight: 800; color: white; font-size: 0.95rem; margin-bottom: 0.75rem;">Popular Destinations</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1.25rem 0.75rem; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 2rem; margin-bottom: 0.25rem;">🗼</div>
+              <div style="font-weight: 800; color: white;">Paris</div>
+              <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 700; margin-top: 0.2rem;">Desde $350</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1.25rem 0.75rem; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 2rem; margin-bottom: 0.25rem;">🏙️</div>
+              <div style="font-weight: 800; color: white;">New York</div>
+              <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 700; margin-top: 0.2rem;">Desde $420</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-weight: 800; color: white; font-size: 0.95rem; margin-bottom: 0.5rem;">Top Deals</div>
+          <div style="background: rgba(255,255,255,0.04); border-radius: 12px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.85rem; color: #cbd5e1;">Vuelo directo a Cancún</span>
+            <span style="font-weight: 800; color: #10b981;">$299</span>
+          </div>
+        </div>
+      `,
+
+      grocery: `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: white; margin: 0;">Grocery</h2>
+          <span style="font-size: 1.15rem; color: #94a3b8;">🔍</span>
+        </div>
+
+        <div>
+          <div style="font-weight: 800; color: white; font-size: 0.95rem; margin-bottom: 0.75rem;">Categories</div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+            <div style="background: rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 0.75rem 0.25rem; text-align: center; border: 1px solid rgba(239, 68, 68, 0.3);">
+              <div style="font-size: 1.5rem;">🍎</div>
+              <div style="font-size: 0.72rem; font-weight: 700; color: #f87171; margin-top: 0.2rem;">Fruits</div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 0.75rem 0.25rem; text-align: center; border: 1px solid rgba(16, 185, 129, 0.3);">
+              <div style="font-size: 1.5rem;">🥦</div>
+              <div style="font-size: 0.72rem; font-weight: 700; color: #34d399; margin-top: 0.2rem;">Vegetables</div>
+            </div>
+            <div style="background: rgba(56, 189, 248, 0.15); border-radius: 12px; padding: 0.75rem 0.25rem; text-align: center; border: 1px solid rgba(56, 189, 248, 0.3);">
+              <div style="font-size: 1.5rem;">🥛</div>
+              <div style="font-size: 0.72rem; font-weight: 700; color: #38bdf8; margin-top: 0.2rem;">Dairy</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-weight: 800; color: white; font-size: 0.95rem; margin-bottom: 0.75rem;">Featured</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1.25rem 0.75rem; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 2.2rem; margin-bottom: 0.25rem;">🍎</div>
+              <div style="font-weight: 800; color: white;">Red Apple</div>
+              <div style="font-size: 0.9rem; color: #10b981; font-weight: 800; margin-top: 0.2rem;">$2.60</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1.25rem 0.75rem; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 2.2rem; margin-bottom: 0.25rem;">🥑</div>
+              <div style="font-weight: 800; color: white;">Avocado</div>
+              <div style="font-size: 0.9rem; color: #10b981; font-weight: 800; margin-top: 0.2rem;">$1.40</div>
+            </div>
+          </div>
+        </div>
+      `
+    };
+
+    function loadScreen(key, btn) {
+      currentScreen = key;
+      document.querySelectorAll('.screen-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const vp = document.getElementById('tab-content');
+      vp.innerHTML = screens[key] || screens.doctor;
+
+      // Actualizar subtítulos explicativos
+      const titleEl = document.getElementById('side-title');
+      const descEl = document.getElementById('side-desc');
+      if (key === 'doctor') {
+        titleEl.textContent = 'DoctorApp (Telemedicina Funcional)';
+        descEl.textContent = 'Módulo médico interactivo con acceso a cámara web real para videoconsultas, monitor de pulso cardíaco en vivo y checklist de tratamiento.';
+        initEKG();
+      } else if (key === 'dashboard') {
+        titleEl.textContent = 'Dashboard Financiero ($4,560)';
+        descEl.textContent = 'Réplica exacta de la pantalla 1 de Flutter: gráfico de onda suave semanal, saldo acumulado y registro de transacciones recientes.';
+      } else if (key === 'tasks') {
+        titleEl.textContent = 'Tareas / To-Do (4 Tasks)';
+        descEl.textContent = 'Pantalla 2 de Flutter: lista de pendientes interactiva con checklist dinámico y botón para añadir nuevas tareas en tiempo real.';
+      } else if (key === 'discover') {
+        titleEl.textContent = 'Discover (Destinos Turísticos)';
+        descEl.textContent = 'Pantalla 3 de Flutter: catálogo de destinos turísticos con tarjetas de París, Nueva York y ofertas destacadas.';
+      } else if (key === 'grocery') {
+        titleEl.textContent = 'Grocery (Supermercado Fresco)';
+        descEl.textContent = 'Pantalla 4 de Flutter: comercio electrónico de alimentos con categorías y productos destacados como Red Apple y Avocado.';
+      }
+    }
+
+    function addNewTaskPrompt() {
+      const task = prompt('Nombre de la nueva tarea:');
+      if (!task) return;
+      const list = document.getElementById('task-list-items');
+      const div = document.createElement('div');
+      div.className = 'med-card';
+      div.onclick = function() { this.classList.toggle('checked'); };
+      div.innerHTML = `
+        <span style="font-size: 0.9rem; font-weight: 600; color: white;">${task}</span>
+        <div style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #38bdf8;"></div>
+      `;
+      list.appendChild(div);
+    }
+
+    // TELEMEDICINA REAL CON WEBCAM EN VIVO
+    async function startTelemedicineCall() {
+      const overlay = document.getElementById('telemed-screen');
+      overlay.style.display = 'flex';
+      
+      let sec = 0;
+      clearInterval(callTimerInterval);
+      callTimerInterval = setInterval(() => {
+        sec++;
+        const m = String(Math.floor(sec / 60)).padStart(2, '0');
+        const s = String(sec % 60).padStart(2, '0');
+        document.getElementById('call-timer').textContent = `${m}:${s}`;
+      }, 1000);
+
+      const badge = document.getElementById('cam-status-badge');
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          const userVideoEl = document.getElementById('user-cam-video');
+          if (userVideoEl) {
+            userVideoEl.srcObject = localStream;
+            userVideoEl.play();
+            badge.innerHTML = "🟢 CÁMARA WEB EN VIVO (CONECTADA)";
+            badge.style.color = "#10b981";
+          }
+        }
+      } catch (err) {
+        badge.innerHTML = "🟡 MODO SIMULADOR (Cámara web no conectada)";
+        badge.style.color = "#fbbf24";
+      }
+    }
+
+    function toggleMuteMic() {
+      const btn = document.getElementById('btn-mute-mic');
+      if (localStream && localStream.getAudioTracks().length > 0) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        audioTrack.enabled = !audioTrack.enabled;
+        btn.innerHTML = audioTrack.enabled ? '🎙️' : '🔇';
+        btn.style.background = audioTrack.enabled ? '#231c47' : '#ef4444';
+      } else {
+        const isMuted = btn.innerHTML === '🔇';
+        btn.innerHTML = isMuted ? '🎙️' : '🔇';
+        btn.style.background = isMuted ? '#231c47' : '#ef4444';
+      }
+    }
+
+    function toggleCamVideo() {
+      const btn = document.getElementById('btn-toggle-cam');
+      if (localStream && localStream.getVideoTracks().length > 0) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        videoTrack.enabled = !videoTrack.enabled;
+        btn.innerHTML = videoTrack.enabled ? '📷' : '🚫';
+        btn.style.background = videoTrack.enabled ? '#231c47' : '#ef4444';
+      } else {
+        const isOff = btn.innerHTML === '🚫';
+        btn.innerHTML = isOff ? '📷' : '🚫';
+        btn.style.background = isOff ? '#231c47' : '#ef4444';
+      }
+    }
+
+    function endTelemedicineCall() {
+      clearInterval(callTimerInterval);
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+      document.getElementById('telemed-screen').style.display = 'none';
+      document.getElementById('call-timer').textContent = "00:00";
+    }
+
+    function addWater(amount) {
+      currentWater = Math.max(0, currentWater + amount);
+      const glasses = Math.round(currentWater / 250);
+      document.getElementById('water-count-text').textContent = `${currentWater.toLocaleString()} / 2,000 ml (${glasses} vasos)`;
+    }
+
+    function toggleMed(id) {
+      const card = document.getElementById('mc-' + id);
+      const btn = card?.querySelector('.check-btn');
+      card?.classList.toggle('checked');
+      btn?.classList.toggle('active');
+    }
+
+    function addNewMedPrompt() {
+      const name = prompt("Nombre y dosis del medicamento (ej: Vitamina D3 2000 UI):");
+      if (!name) return;
+      const time = prompt("Hora de toma (ej: 08:30 AM):") || "08:00 AM";
+
+      const id = Date.now();
+      const div = document.createElement('div');
+      div.className = 'med-card';
+      div.id = 'mc-' + id;
+      div.innerHTML = `
+        <div>
+          <div style="font-size: 0.88rem; font-weight: 700; color: white;">${name}</div>
+          <div style="font-size: 0.75rem; color: #94a3b8;">${time} • Programado</div>
+        </div>
+        <button class="check-btn" onclick="toggleMed(${id})">✓</button>
+      `;
+      document.getElementById('med-container')?.appendChild(div);
+    }
+
+    function changeBPM(val) {
+      currentBPM = parseInt(val);
+      const valEl = document.getElementById('bpm-val');
+      const statusEl = document.getElementById('bpm-status');
+      if (valEl) valEl.textContent = `${currentBPM} BPM`;
+      if (statusEl) {
+        if (currentBPM < 55) {
+          statusEl.textContent = 'Bradicardia Sinusal';
+          statusEl.style.color = '#38bdf8';
+        } else if (currentBPM <= 100) {
+          statusEl.textContent = 'Ritmo Sinusal Normal';
+          statusEl.style.color = '#10b981';
+        } else {
+          statusEl.textContent = 'Taquicardia';
+          statusEl.style.color = '#f43f5e';
+        }
+      }
+    }
+
+    // EKG ANIMATION
+    let ekgPoints = [];
+    let ekgStep = 0;
+    function initEKG() {
+      const cvs = document.getElementById('ekg-canvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+
+      function draw() {
+        if (!document.getElementById('ekg-canvas')) return;
+        ctx.fillStyle = "rgba(8, 6, 19, 0.25)";
+        ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+        const lineColor = currentBPM > 100 ? "#f43f5e" : (currentBPM < 55 ? "#38bdf8" : "#a855f7");
+        ctx.strokeStyle = lineColor;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        ekgStep += (currentBPM / 74) * 2;
+        let y = 35;
+        const mod = ekgStep % 80;
+        if (mod > 25 && mod < 30) y = 15;
+        else if (mod >= 30 && mod < 35) y = 55;
+        else if (mod >= 35 && mod < 40) y = 5;
+        else if (mod >= 40 && mod < 45) y = 60;
+        else if (mod >= 45 && mod < 55) y = 25;
+
+        ekgPoints.push(y);
+        if (ekgPoints.length > cvs.width / 2) ekgPoints.shift();
+
+        ekgPoints.forEach((pt, idx) => {
+          const x = idx * 2;
+          if (idx === 0) ctx.moveTo(x, pt);
+          else ctx.lineTo(x, pt);
+        });
+        ctx.stroke();
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    function switchInnerTab(idx, btn) {
+      document.querySelectorAll('#phone-nav-bar .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const vp = document.getElementById('tab-content');
+      if (idx === 0) {
+        loadScreen(currentScreen);
+      } else if (idx === 1) {
+        vp.innerHTML = `
+          <h3 style="color: white; font-weight: 800;">📅 Mis Citas Médicas</h3>
+          <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1.1rem; border: 1px solid rgba(168,85,247,0.25);">
+            <div style="font-weight: 700; color: var(--m-fuchsia);">Dra. Elena Ruiz (Cardiología)</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin: 0.2rem 0 0.6rem;">Hoy, 10:30 AM • Consultorio Virtual</div>
+            <button onclick="startTelemedicineCall()" style="background: var(--m-purple); color: white; border: none; padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+              📹 Entrar a la Consulta Virtual
+            </button>
+          </div>
+        `;
+      } else if (idx === 2) {
+        vp.innerHTML = `
+          <h3 style="color: white; font-weight: 800;">💊 Recetas Digitales</h3>
+          <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(168,85,247,0.25); text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📱 QR</div>
+            <div style="font-weight: 700; color: white;">Receta Médica RX-88910</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin: 0.4rem 0 1rem;">Losartán 50mg • Omega 3</div>
+            <div style="background: rgba(16,185,129,0.15); color: #34d399; font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: bold;">
+              ✓ Firma Médica Digital Validada
+            </div>
+          </div>
+        `;
+      } else if (idx === 3) {
+        vp.innerHTML = `
+          <h3 style="color: white; font-weight: 800;">👤 Perfil del Paciente</h3>
+          <div style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1.2rem; border: 1px solid rgba(168,85,247,0.25);">
+            <div style="font-size: 0.85rem; color: #94a3b8;">Paciente: <strong style="color:white;">Carlos Mendoza</strong></div>
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">Tipo Sanguíneo: <strong style="color:#f43f5e;">O+</strong></div>
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">Alergias Conocidas: <strong style="color:white;">Penicilina</strong></div>
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">Contacto de Emergencia: <strong style="color:white;">+505 2200 0000</strong></div>
+          </div>
+        `;
+      }
+    }
+
+    let m_theme = localStorage.getItem('theme') || 'dark';
+    function toggleTheme() {
+      m_theme = m_theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', m_theme);
+      localStorage.setItem('theme', m_theme);
+      document.getElementById('btn-theme').textContent = m_theme === 'dark' ? '🌙 Noche' : '☀️ Día';
+    }
+
+    document.documentElement.setAttribute('data-theme', m_theme);
+    loadScreen('doctor');
+  </script>
+</body>
+</html>

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ML Model Comparison Studio | Data Mining & Predictive Modeling</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ml-bg: #0c0a1a;
+      --ml-card: #141126;
+      --ml-card-hover: #1f1a3a;
+      --ml-border: rgba(168, 85, 247, 0.2);
+      --ml-text: #f8fafc;
+      --ml-muted: #cbd5e1;
+      --ml-purple: #8b5cf6;
+      --ml-violet: #7c3aed;
+      --ml-fuchsia: #c084fc;
+      --ml-emerald: #10b981;
+      --ml-amber: #f59e0b;
+      --ml-blue: #38bdf8;
+      --ml-rose: #f43f5e;
+    }
+    [data-theme="light"] {
+      --ml-bg: #f8f6ff;
+      --ml-card: #ffffff;
+      --ml-card-hover: #f3efff;
+      --ml-border: #e5dbff;
+      --ml-text: #1e113f;
+      --ml-muted: #564875;
+      --ml-purple: #7c3aed;
+      --ml-violet: #6d28d9;
+      --ml-fuchsia: #a855f7;
+      --ml-emerald: #059669;
+      --ml-amber: #d97706;
+      --ml-blue: #0284c7;
+      --ml-rose: #e11d48;
+    }
+    body {
+      background-color: var(--ml-bg);
+      color: var(--ml-text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+    .app-nav {
+      background: var(--ml-card);
+      border-bottom: 1px solid var(--ml-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+    .model-selector {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0 2rem;
+    }
+    .m-btn {
+      background: var(--ml-card);
+      border: 1px solid var(--ml-border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      color: var(--ml-muted);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .m-btn.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: var(--ml-purple);
+      color: var(--ml-fuchsia);
+      box-shadow: 0 0 18px rgba(124, 58, 237, 0.35);
+    }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--ml-card);
+      border: 1px solid var(--ml-border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--ml-purple);
+    }
+    .kpi-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--ml-fuchsia);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 0.3rem;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (max-width: 900px) {
+      .grid-2col { grid-template-columns: 1fr; }
+    }
+    .panel-box {
+      background: var(--ml-card);
+      border: 1px solid var(--ml-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    .conf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+    .c-cell {
+      border: 1px solid var(--ml-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .c-cell.ok {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .c-cell.err {
+      background: rgba(244, 63, 94, 0.1);
+      border-color: rgba(244, 63, 94, 0.4);
+    }
+    .c-num {
+      font-size: 1.75rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1.1rem;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--ml-muted);
+      font-weight: 700;
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--ml-purple);
+    }
+    .feat-bar-bg {
+      background: rgba(255,255,255,0.06);
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+    .feat-bar-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: 5px;
+    }
+    #roc-canvas {
+      background: #090714;
+      border: 1px solid var(--ml-border);
+      border-radius: 12px;
+      width: 100%;
+      height: 280px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="app-nav">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <a href="../../../index.html" style="color: var(--ml-fuchsia); font-weight: 800; text-decoration: none; font-size: 0.95rem;">
+        ← <span id="txt-back">Volver al Portafolio</span>
+      </a>
+      <div style="font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>📊</span>
+        <span>ML Comparison Studio — Data Science &amp; Predictive Analytics</span>
+      </div>
+      <span style="font-size: 0.75rem; background: rgba(168,85,247,0.15); color: var(--ml-fuchsia); padding: 0.25rem 0.65rem; border-radius: 999px; font-weight: 700;">
+        🔬 Ciencia de Datos &amp; Machine Learning en Python
+      </span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button onclick="toggleTheme()" class="control-btn" id="btn-theme">🌙 Noche</button>
+      <button onclick="toggleLang()" class="control-btn" id="btn-lang">🇪🇸 ES</button>
+    </div>
+  </nav>
+
+  <div style="max-width: 1200px; margin: 0 auto; padding: 1.5rem;">
+
+    <!-- SELECTOR DE MODELO -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <h3 style="font-weight: 800;" id="txt-choose-algo">Selecciona el Algoritmo Evaluado:</h3>
+      <span style="font-size: 0.82rem; color: var(--ml-muted); font-family: 'JetBrains Mono';" id="txt-dataset-info">Dataset: 2,500 Clientes Crediticios | Cross-Validation: 10-Fold Stratified</span>
+    </div>
+
+    <div class="model-selector">
+      <button class="m-btn active" onclick="pickModel(0)" id="mbtn-0">🌲 Random Forest Classifier</button>
+      <button class="m-btn" onclick="pickModel(1)" id="mbtn-1">⚡ Support Vector Machine (SVM)</button>
+      <button class="m-btn" onclick="pickModel(2)" id="mbtn-2">📈 Regresión Logística</button>
+      <button class="m-btn" onclick="pickModel(3)" id="mbtn-3">🌿 Árbol de Decisión (C4.5)</button>
+    </div>
+
+    <!-- KPIS DE RENDIMIENTO -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); font-weight: 700;">Accuracy (Exactitud)</div>
+        <div class="kpi-val" id="k-acc">94.8%</div>
+      </div>
+      <div class="kpi-card">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); font-weight: 700;">Precision (Precisión)</div>
+        <div class="kpi-val" id="k-prec">93.2%</div>
+      </div>
+      <div class="kpi-card">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); font-weight: 700;">Recall (Sensibilidad)</div>
+        <div class="kpi-val" id="k-rec">96.0%</div>
+      </div>
+      <div class="kpi-card">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); font-weight: 700;">F1-Score Ponderado</div>
+        <div class="kpi-val" id="k-f1">94.6%</div>
+      </div>
+      <div class="kpi-card">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); font-weight: 700;">ROC-AUC Score</div>
+        <div class="kpi-val" style="color: var(--ml-emerald);" id="k-auc">0.978</div>
+      </div>
+    </div>
+
+    <!-- SECCION COMPARATIVA 1: CURVA ROC MULTI-MODELO & MATRIZ DE CONFUSION -->
+    <div class="grid-2col">
+      <!-- CURVA ROC CANVAS -->
+      <div class="panel-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h3 style="font-weight: 800;" id="txt-roc-title">Curvas ROC Multi-Modelo (Receiver Operating Characteristic)</h3>
+        </div>
+        <p style="color: var(--ml-muted); font-size: 0.85rem; margin-bottom: 1rem;" id="txt-roc-desc">
+          Evaluación de la tasa de verdaderos positivos (Sensibilidad) vs falsos positivos (1 - Especificidad).
+        </p>
+        <canvas id="roc-canvas" width="520" height="280"></canvas>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.75rem; font-size: 0.75rem; font-family: 'JetBrains Mono';">
+          <span style="color: #c084fc;">■ Random Forest (0.978)</span>
+          <span style="color: #8b5cf6;">■ SVM (0.942)</span>
+          <span style="color: #38bdf8;">■ Reg. Logística (0.891)</span>
+          <span style="color: #10b981;">■ Árbol (0.865)</span>
+        </div>
+      </div>
+
+      <!-- MATRIZ DE CONFUSION -->
+      <div class="panel-box">
+        <h3 style="font-weight: 800; margin-bottom: 0.4rem;" id="txt-matrix-title">Matriz de Confusión (Test Set: 500 registros)</h3>
+        <p style="color: var(--ml-muted); font-size: 0.85rem;" id="txt-matrix-desc">Valores observados vs predicción del clasificador.</p>
+
+        <div class="conf-grid">
+          <div class="c-cell ok">
+            <div class="c-num" id="tp-val">320</div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); margin-top: 0.2rem;" id="txt-tp">Verdaderos Positivos (TP)</div>
+          </div>
+          <div class="c-cell err">
+            <div class="c-num" id="fp-val">18</div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); margin-top: 0.2rem;" id="txt-fp">Falsos Positivos (FP)</div>
+          </div>
+          <div class="c-cell err">
+            <div class="c-num" id="fn-val">12</div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); margin-top: 0.2rem;" id="txt-fn">Falsos Negativos (FN)</div>
+          </div>
+          <div class="c-cell ok">
+            <div class="c-num" id="tn-val">150</div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--ml-muted); margin-top: 0.2rem;" id="txt-tn">Verdaderos Negativos (TN)</div>
+          </div>
+        </div>
+
+        <!-- UMBRAL DE DECISIÓN CLASIFICADOR -->
+        <div style="margin-top: 1.25rem; background: rgba(255,255,255,0.02); border: 1px solid var(--ml-border); border-radius: 10px; padding: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--ml-muted);">
+            <span>Umbral de Decisión (Classification Threshold):</span>
+            <strong id="thresh-val" style="color: var(--ml-fuchsia);">0.50</strong>
+          </div>
+          <input type="range" min="0.10" max="0.90" step="0.05" value="0.50" id="sl-thresh" oninput="adjustThreshold(this.value)" style="width: 100%; accent-color: var(--ml-purple); margin-top: 0.35rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: #64748b; margin-top: 0.2rem;">
+            <span>0.10 (Alta Sensibilidad / Más Falsos Positivos)</span>
+            <span>0.90 (Alta Especificidad / Menos Aprobados)</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; font-size: 0.82rem; color: var(--ml-muted); line-height: 1.5;" id="matrix-insight">
+          💡 <strong>Análisis:</strong> Alta tasa de Verdaderos Positivos garantiza aprobación ágil sin incurrir en mora crediticia.
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCION COMPARATIVA 2: HYPERPARAMETER TUNING & SIMULADOR DE INFERENCIA -->
+    <div class="grid-2col">
+      <!-- LABORATORIO DE HIPERPARÁMETROS (TUNING) -->
+      <div class="panel-box">
+        <h3 style="font-weight: 800; margin-bottom: 0.4rem;" id="txt-tune-title">Laboratorio de Hiperparámetros & Diagnóstico de Overfitting</h3>
+        <p style="color: var(--ml-muted); font-size: 0.85rem; margin-bottom: 1.25rem;" id="txt-tune-sub">
+          Ajusta los hiperparámetros en tiempo real y analiza la brecha entre Train vs Test Accuracy.
+        </p>
+
+        <div class="slider-row">
+          <div class="slider-lbl">
+            <span>n_estimators (Número de Árboles)</span>
+            <strong id="out-nest">100 árboles</strong>
+          </div>
+          <input type="range" id="sl-nest" min="10" max="300" step="10" value="100" oninput="updateHyperparams()">
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-lbl">
+            <span>max_depth (Profundidad Máxima del Árbol)</span>
+            <strong id="out-depth">10 niveles</strong>
+          </div>
+          <input type="range" id="sl-depth" min="2" max="25" step="1" value="10" oninput="updateHyperparams()">
+        </div>
+
+        <!-- RESULTADOS EN TIEMPO REAL -->
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--ml-border); border-radius: 12px; padding: 1.25rem; margin-top: 1rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem;">
+            <span>Training Set Accuracy:</span>
+            <strong id="train-acc-val" style="color: var(--ml-fuchsia);">96.2%</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem;">
+            <span>Test / Validation Accuracy:</span>
+            <strong id="test-acc-val" style="color: var(--ml-emerald);">94.8%</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--ml-border); padding-top: 0.75rem;">
+            <span style="font-size: 0.8rem; color: var(--ml-muted);">Estado del Modelo:</span>
+            <span id="overfit-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 0.25rem 0.65rem; border-radius: 999px; font-weight: 800; font-size: 0.75rem;">
+              ✓ GENERALIZACIÓN ÓPTIMA
+            </span>
+          </div>
+        </div>
+
+        <!-- IMPORTANCIA DE CARACTERÍSTICAS (FEATURE IMPORTANCE) -->
+        <div style="margin-top: 1.5rem;">
+          <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--ml-muted); text-transform: uppercase; margin-bottom: 0.75rem;">Importancia de Atributos (Gini Feature Importance):</h4>
+          
+          <div style="margin-bottom: 0.6rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+              <span>Score Crediticio</span>
+              <strong>38%</strong>
+            </div>
+            <div class="feat-bar-bg"><div class="feat-bar-fill" style="width: 38%;"></div></div>
+          </div>
+          <div style="margin-bottom: 0.6rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+              <span>Ingreso Mensual</span>
+              <strong>29%</strong>
+            </div>
+            <div class="feat-bar-bg"><div class="feat-bar-fill" style="width: 29%;"></div></div>
+          </div>
+          <div style="margin-bottom: 0.6rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+              <span>Edad</span>
+              <strong>17%</strong>
+            </div>
+            <div class="feat-bar-bg"><div class="feat-bar-fill" style="width: 17%;"></div></div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+              <span>Ratio Deuda / Ingreso</span>
+              <strong>16%</strong>
+            </div>
+            <div class="feat-bar-bg"><div class="feat-bar-fill" style="width: 16%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULADOR DE INFERENCIA PREDICTIVA -->
+      <div class="panel-box">
+        <h3 style="font-weight: 800; margin-bottom: 0.4rem;" id="txt-infer-title">Simulador de Inferencia Predictiva</h3>
+        <p style="color: var(--ml-muted); font-size: 0.85rem; margin-bottom: 1.25rem;" id="txt-infer-desc">
+          Modifica los parámetros del cliente financiero y observa el dictamen probabilístico inmediato.
+        </p>
+
+        <div>
+          <div class="slider-row">
+            <div class="slider-lbl">
+              <span id="txt-age-lbl">Edad del Solicitante</span>
+              <strong id="age-out">38 años</strong>
+            </div>
+            <input type="range" id="sl-age" min="18" max="75" value="38" oninput="calcProb()">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-lbl">
+              <span id="txt-income-lbl">Ingreso Mensual Estimado</span>
+              <strong id="income-out">$3,400 USD</strong>
+            </div>
+            <input type="range" id="sl-income" min="800" max="10000" step="100" value="3400" oninput="calcProb()">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-lbl">
+              <span id="txt-score-lbl">Score Crediticio (300-850)</span>
+              <strong id="score-out">720 pts</strong>
+            </div>
+            <input type="range" id="sl-score" min="300" max="850" value="720" oninput="calcProb()">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-lbl">
+              <span id="txt-debt-lbl">Deuda Total Actual</span>
+              <strong id="debt-out">$1,200 USD</strong>
+            </div>
+            <input type="range" id="sl-debt" min="0" max="15000" step="200" value="1200" oninput="calcProb()">
+          </div>
+
+          <!-- RESULTADO -->
+          <div style="background: var(--ml-card-hover); border: 1px solid var(--ml-border); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span style="font-size: 0.85rem; color: var(--ml-muted); font-weight: 700;" id="txt-prob-lbl">Probabilidad de Aprobación:</span>
+              <span style="font-weight: 800; font-size: 1.3rem; color: #10b981;" id="prob-num">88.5%</span>
+            </div>
+            <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden;">
+              <div id="prob-fill" style="width: 88.5%; height: 100%; background: #10b981; transition: width 0.3s;"></div>
+            </div>
+            <div style="margin-top: 0.85rem; font-size: 0.9rem; font-weight: 800; color: #34d399;" id="verdict-label">
+              ✓ Dictamen: SOLICITUD DE BAJO RIESGO (APROBADO)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const ml_i18n = {
+      es: {
+        back: "Volver al Portafolio",
+        chooseAlgo: "Selecciona el Algoritmo Evaluado:",
+        datasetInfo: "Dataset: 2,500 Clientes Crediticios | Cross-Validation: 10-Fold Stratified",
+        rocTitle: "Curvas ROC Multi-Modelo (Receiver Operating Characteristic)",
+        rocDesc: "Evaluación de la tasa de verdaderos positivos (Sensibilidad) vs falsos positivos (1 - Especificidad).",
+        matrixTitle: "Matriz de Confusión (Test Set: 500 registros)",
+        matrixDesc: "Valores observados vs predicción del clasificador.",
+        tp: "Verdaderos Positivos (TP)",
+        fp: "Falsos Positivos (FP)",
+        fn: "Falsos Negativos (FN)",
+        tn: "Verdaderos Negativos (TN)",
+        tuneTitle: "Laboratorio de Hiperparámetros & Diagnóstico de Overfitting",
+        tuneSub: "Ajusta los hiperparámetros en tiempo real y analiza la brecha entre Train vs Test Accuracy.",
+        inferTitle: "Simulador de Inferencia Predictiva",
+        inferDesc: "Modifica los parámetros del cliente financiero y observa el dictamen probabilístico inmediato.",
+        ageLbl: "Edad del Solicitante",
+        incomeLbl: "Ingreso Mensual Estimado",
+        scoreLbl: "Score Crediticio (300-850)",
+        debtLbl: "Deuda Total Actual",
+        probLbl: "Probabilidad de Aprobación:",
+        btnNight: "🌙 Noche",
+        btnDay: "☀️ Día"
+      },
+      en: {
+        back: "Back to Portfolio",
+        chooseAlgo: "Select Evaluated Algorithm:",
+        datasetInfo: "Dataset: 2,500 Financial Customers | Cross-Validation: 10-Fold Stratified",
+        rocTitle: "Multi-Model ROC Curves (Receiver Operating Characteristic)",
+        rocDesc: "True Positive Rate (Sensitivity) vs False Positive Rate (1 - Specificity).",
+        matrixTitle: "Confusion Matrix (Test Set: 500 records)",
+        matrixDesc: "Actual values vs classifier predictions.",
+        tp: "True Positives (TP)",
+        fp: "False Positives (FP)",
+        fn: "False Negatives (FN)",
+        tn: "True Negatives (TN)",
+        tuneTitle: "Hyperparameter Tuning & Overfitting Diagnostic Lab",
+        tuneSub: "Tune hyperparameters live and analyze the Train vs Test accuracy gap.",
+        inferTitle: "Predictive Inference Simulator",
+        inferDesc: "Adjust financial customer attributes and observe instant probabilistic risk verdict.",
+        ageLbl: "Applicant Age",
+        incomeLbl: "Estimated Monthly Income",
+        scoreLbl: "Credit Score (300-850)",
+        debtLbl: "Current Total Debt",
+        probLbl: "Approval Probability:",
+        btnNight: "🌙 Night",
+        btnDay: "☀️ Day"
+      }
+    };
+
+    let ml_lang = localStorage.getItem('lang') || 'es';
+    let ml_theme = localStorage.getItem('theme') || 'dark';
+
+    const modelsData = [
+      {
+        name: "Random Forest Classifier",
+        acc: "94.8%", prec: "93.2%", rec: "96.0%", f1: "94.6%", auc: "0.978",
+        tp: 320, fp: 18, fn: 12, tn: 150,
+        insight_es: "💡 <strong>Análisis:</strong> El ensamble de árboles reduce la varianza y produce la frontera de decisión más balanceada.",
+        insight_en: "💡 <strong>Insight:</strong> Ensemble bagging reduces variance and yields the most robust decision boundary."
+      },
+      {
+        name: "Support Vector Machine (SVM)",
+        acc: "92.4%", prec: "91.0%", rec: "93.5%", f1: "92.2%", auc: "0.942",
+        tp: 312, fp: 24, fn: 21, tn: 143,
+        insight_es: "💡 <strong>Análisis:</strong> Kernel RBF mapea de forma óptima las dimensiones no lineales con excelente margen de separación.",
+        insight_en: "💡 <strong>Insight:</strong> RBF Kernel efficiently projects nonlinear boundaries with high margin separation."
+      },
+      {
+        name: "Regresión Logística",
+        acc: "87.6%", prec: "85.4%", rec: "89.2%", f1: "87.2%", auc: "0.891",
+        tp: 298, fp: 38, fn: 33, tn: 131,
+        insight_es: "💡 <strong>Análisis:</strong> Modelo base lineal altamente interpretable mediante Odds Ratios y función Sigmoide.",
+        insight_en: "💡 <strong>Insight:</strong> Highly interpretable linear baseline using Odds Ratios and Sigmoid activation."
+      },
+      {
+        name: "Árbol de Decisión (C4.5)",
+        acc: "84.2%", prec: "82.1%", rec: "86.0%", f1: "84.0%", auc: "0.865",
+        tp: 285, fp: 46, fn: 42, tn: 127,
+        insight_es: "💡 <strong>Análisis:</strong> Reglas if/else intuitivas con criterio de impureza Gini, propenso a overfitting sin poda.",
+        insight_en: "💡 <strong>Insight:</strong> Intuitive if/else rule tree using Gini impurity, prone to overfitting without pruning."
+      }
+    ];
+
+    let currentModelIndex = 0;
+
+    function pickModel(idx) {
+      currentModelIndex = idx;
+      document.querySelectorAll('.m-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+      const m = modelsData[idx];
+
+      document.getElementById('k-acc').textContent = m.acc;
+      document.getElementById('k-prec').textContent = m.prec;
+      document.getElementById('k-rec').textContent = m.rec;
+      document.getElementById('k-f1').textContent = m.f1;
+      document.getElementById('k-auc').textContent = m.auc;
+
+      document.getElementById('tp-val').textContent = m.tp;
+      document.getElementById('fp-val').textContent = m.fp;
+      document.getElementById('fn-val').textContent = m.fn;
+      document.getElementById('tn-val').textContent = m.tn;
+
+      document.getElementById('matrix-insight').innerHTML = ml_lang === 'es' ? m.insight_es : m.insight_en;
+
+      const slThresh = document.getElementById('sl-thresh');
+      if (slThresh) slThresh.value = "0.50";
+      const thVal = document.getElementById('thresh-val');
+      if (thVal) thVal.textContent = "0.50";
+
+      calcProb();
+      drawROCCurves();
+    }
+
+    function adjustThreshold(val) {
+      const t = parseFloat(val);
+      document.getElementById('thresh-val').textContent = t.toFixed(2);
+      const m = modelsData[currentModelIndex];
+
+      // Shift dynamic confusion matrix according to threshold
+      const delta = Math.round((0.50 - t) * 60);
+      const newTP = Math.min(332, Math.max(220, m.tp + delta));
+      const newFP = Math.min(60, Math.max(5, m.fp + Math.round(delta * 0.7)));
+      const newFN = Math.min(112, Math.max(2, m.fn - delta));
+      const newTN = Math.min(170, Math.max(100, m.tn - Math.round(delta * 0.7)));
+
+      document.getElementById('tp-val').textContent = newTP;
+      document.getElementById('fp-val').textContent = newFP;
+      document.getElementById('fn-val').textContent = newFN;
+      document.getElementById('tn-val').textContent = newTN;
+
+      // Recalcular métricas
+      const newPrecision = ((newTP / (newTP + newFP)) * 100).toFixed(1);
+      const newRecall = ((newTP / (newTP + newFN)) * 100).toFixed(1);
+      document.getElementById('k-prec').textContent = `${newPrecision}%`;
+      document.getElementById('k-rec').textContent = `${newRecall}%`;
+    }
+
+    // DIBUJO DE CURVAS ROC EN CANVAS
+    function drawROCCurves() {
+      const canvas = document.getElementById('roc-canvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const pad = 40;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Ejes y Grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const x = pad + (i / 5) * (w - pad * 2);
+        const y = pad + (i / 5) * (h - pad * 2);
+        // Vertical lines
+        ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, h - pad); ctx.stroke();
+        // Horizontal lines
+        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w - pad, y); ctx.stroke();
+      }
+
+      // Ejes X e Y
+      ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad, pad);
+      ctx.lineTo(pad, h - pad);
+      ctx.lineTo(w - pad, h - pad);
+      ctx.stroke();
+
+      // Etiquetas Ejes
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.fillText('0.0 (FPR)', pad - 10, h - pad + 15);
+      ctx.fillText('1.0 (FPR)', w - pad - 20, h - pad + 15);
+      ctx.fillText('1.0 (TPR)', pad - 35, pad + 10);
+
+      // Linea de azar diagonal (AUC 0.5)
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(pad, h - pad);
+      ctx.lineTo(w - pad, pad);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Curvas ROC
+      const curves = [
+        { color: '#c084fc', width: 3, points: [[0, 0], [0.03, 0.72], [0.08, 0.89], [0.18, 0.95], [0.35, 0.98], [1, 1]] }, // RF
+        { color: '#8b5cf6', width: 2, points: [[0, 0], [0.06, 0.65], [0.12, 0.82], [0.25, 0.91], [0.45, 0.96], [1, 1]] }, // SVM
+        { color: '#38bdf8', width: 2, points: [[0, 0], [0.10, 0.58], [0.20, 0.74], [0.35, 0.85], [0.60, 0.92], [1, 1]] }, // LR
+        { color: '#10b981', width: 2, points: [[0, 0], [0.12, 0.52], [0.25, 0.68], [0.42, 0.80], [0.68, 0.89], [1, 1]] }  // Tree
+      ];
+
+      curves.forEach((c, idx) => {
+        ctx.strokeStyle = c.color;
+        ctx.lineWidth = idx === currentModelIndex ? 3.5 : 1.5;
+        ctx.beginPath();
+        c.points.forEach((pt, ptIdx) => {
+          const px = pad + pt[0] * (w - pad * 2);
+          const py = (h - pad) - pt[1] * (h - pad * 2);
+          if (ptIdx === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+      });
+    }
+
+    // HIPERPARÁMETROS TUNING
+    function updateHyperparams() {
+      const nest = parseInt(document.getElementById('sl-nest').value);
+      const depth = parseInt(document.getElementById('sl-depth').value);
+
+      document.getElementById('out-nest').textContent = `${nest} árboles`;
+      document.getElementById('out-depth').textContent = `${depth} niveles`;
+
+      // Simulación de Overfitting Curve
+      let trainAcc = Math.min(99.8, 82 + (depth * 0.85) + (nest * 0.03));
+      let testAcc = 80 + (Math.sin(depth / 4) * 12) + (Math.min(nest, 120) * 0.04);
+      if (depth > 14) {
+        testAcc -= (depth - 14) * 0.9; // Degradación por sobreajuste
+      }
+      testAcc = Math.min(95.4, Math.max(78.0, testAcc));
+
+      document.getElementById('train-acc-val').textContent = `${trainAcc.toFixed(1)}%`;
+      document.getElementById('test-acc-val').textContent = `${testAcc.toFixed(1)}%`;
+
+      const gap = trainAcc - testAcc;
+      const badge = document.getElementById('overfit-badge');
+
+      if (gap > 6.0) {
+        badge.textContent = '⚠️ SOBREAJUSTE (OVERFITTING)';
+        badge.style.background = 'rgba(244, 63, 94, 0.2)';
+        badge.style.color = '#fda4af';
+      } else if (depth < 4) {
+        badge.textContent = '🔻 SUBAJUSTE (UNDERFITTING)';
+        badge.style.background = 'rgba(245, 158, 11, 0.2)';
+        badge.style.color = '#fbbf24';
+      } else {
+        badge.textContent = '✓ GENERALIZACIÓN ÓPTIMA';
+        badge.style.background = 'rgba(16, 185, 129, 0.2)';
+        badge.style.color = '#34d399';
+      }
+    }
+
+    // INFERENCIA PREDICTIVA
+    function calcProb() {
+      const age = parseInt(document.getElementById('sl-age').value);
+      const income = parseInt(document.getElementById('sl-income').value);
+      const score = parseInt(document.getElementById('sl-score').value);
+      const debt = parseInt(document.getElementById('sl-debt').value);
+
+      document.getElementById('age-out').textContent = `${age} años`;
+      document.getElementById('income-out').textContent = `$${income.toLocaleString()} USD`;
+      document.getElementById('score-out').textContent = `${score} pts`;
+      document.getElementById('debt-out').textContent = `$${debt.toLocaleString()} USD`;
+
+      // Modelo logístico ponderado
+      let z = -4.5 + (score * 0.008) + (income * 0.00045) + (age * 0.015) - (debt * 0.00035);
+      // Ajuste por modelo seleccionado
+      if (currentModelIndex === 0) z += 0.2; // RF ligeramente más optimista con buenos scores
+      if (currentModelIndex === 2) z -= 0.1; // LR más estricto
+
+      const prob = 1 / (1 + Math.exp(-z));
+      const pct = Math.min(99.4, Math.max(2.1, prob * 100));
+
+      document.getElementById('prob-num').textContent = pct.toFixed(1) + '%';
+      document.getElementById('prob-fill').style.width = pct + '%';
+
+      const vLbl = document.getElementById('verdict-label');
+      if (pct >= 70) {
+        document.getElementById('prob-num').style.color = '#10b981';
+        document.getElementById('prob-fill').style.background = '#10b981';
+        vLbl.textContent = ml_lang === 'es' ? '✓ Dictamen: SOLICITUD DE BAJO RIESGO (APROBADO)' : '✓ Verdict: LOW RISK APPLICATION (APPROVED)';
+        vLbl.style.color = '#34d399';
+      } else if (pct >= 45) {
+        document.getElementById('prob-num').style.color = '#fbbf24';
+        document.getElementById('prob-fill').style.background = '#fbbf24';
+        vLbl.textContent = ml_lang === 'es' ? '⚠️ Dictamen: RIESGO MEDIO (REQUIERE AVAL O GARANTÍA)' : '⚠️ Verdict: MODERATE RISK (REQUIRES GUARANTOR)';
+        vLbl.style.color = '#fbbf24';
+      } else {
+        document.getElementById('prob-num').style.color = '#f43f5e';
+        document.getElementById('prob-fill').style.background = '#f43f5e';
+        vLbl.textContent = ml_lang === 'es' ? '⛔ Dictamen: ALTO RIESGO CREDITICIO (RECHAZADO)' : '⛔ Verdict: HIGH CREDIT RISK (REJECTED)';
+        vLbl.style.color = '#f43f5e';
+      }
+    }
+
+    function toggleTheme() {
+      ml_theme = ml_theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', ml_theme);
+      localStorage.setItem('theme', ml_theme);
+      document.getElementById('btn-theme').textContent = ml_theme === 'dark' ? ml_i18n[ml_lang].btnNight : ml_i18n[ml_lang].btnDay;
+      drawROCCurves();
+    }
+
+    function toggleLang() {
+      ml_lang = ml_lang === 'es' ? 'en' : 'es';
+      localStorage.setItem('lang', ml_lang);
+      applyMLLang();
+    }
+
+    function applyMLLang() {
+      const d = ml_i18n[ml_lang];
+      document.getElementById('btn-lang').textContent = ml_lang === 'es' ? '🇪🇸 ES' : '🇺🇸 EN';
+      document.getElementById('btn-theme').textContent = ml_theme === 'dark' ? d.btnNight : d.btnDay;
+      document.getElementById('txt-back').textContent = d.back;
+      document.getElementById('txt-choose-algo').textContent = d.chooseAlgo;
+      document.getElementById('txt-dataset-info').textContent = d.datasetInfo;
+      document.getElementById('txt-roc-title').textContent = d.rocTitle;
+      document.getElementById('txt-roc-desc').textContent = d.rocDesc;
+      document.getElementById('txt-matrix-title').textContent = d.matrixTitle;
+      document.getElementById('txt-matrix-desc').textContent = d.matrixDesc;
+      document.getElementById('txt-tp').textContent = d.tp;
+      document.getElementById('txt-fp').textContent = d.fp;
+      document.getElementById('txt-fn').textContent = d.fn;
+      document.getElementById('txt-tn').textContent = d.tn;
+      document.getElementById('txt-tune-title').textContent = d.tuneTitle;
+      document.getElementById('txt-tune-sub').textContent = d.tuneSub;
+      document.getElementById('txt-infer-title').textContent = d.inferTitle;
+      document.getElementById('txt-infer-desc').textContent = d.inferDesc;
+      document.getElementById('txt-age-lbl').textContent = d.ageLbl;
+      document.getElementById('txt-income-lbl').textContent = d.incomeLbl;
+      document.getElementById('txt-score-lbl').textContent = d.scoreLbl;
+      document.getElementById('txt-debt-lbl').textContent = d.debtLbl;
+      document.getElementById('txt-prob-lbl').textContent = d.probLbl;
+      pickModel(currentModelIndex);
+      updateHyperparams();
+    }
+
+    document.documentElement.setAttribute('data-theme', ml_theme);
+    applyMLLang();
+    drawROCCurves();
+  </script>
+</body>
+</html>
